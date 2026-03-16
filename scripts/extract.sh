@@ -109,7 +109,14 @@ bq query --use_legacy_sql=false --format=prettyjson --max_rows=500000 --project_
     total_bytes_billed,
     total_slot_ms,
     cache_hit,
-    referenced_tables
+    referenced_tables,
+    labels,
+    CASE
+      WHEN user_email LIKE '%gserviceaccount.com' THEN 'service_account'
+      WHEN EXISTS(SELECT 1 FROM UNNEST(labels) l WHERE l.key IN ('airflow_dag_id', 'dbt_invocation_id', 'scheduled_query_id')) THEN 'scheduled'
+      WHEN job_creation_reason.code = 'REQUESTED' AND priority = 'BATCH' THEN 'batch'
+      ELSE 'ad_hoc'
+    END AS query_source
   FROM \`$PROJECT_ID\`.\`region-$REGION\`.INFORMATION_SCHEMA.JOBS
   WHERE
     creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
@@ -120,6 +127,31 @@ bq query --use_legacy_sql=false --format=prettyjson --max_rows=500000 --project_
 " > "$OUTPUT_DIR/query_logs.json"
 QUERY_COUNT=$(python3 -c "import json; print(len(json.load(open('$OUTPUT_DIR/query_logs.json'))))" 2>/dev/null || echo "?")
 echo "   ✓ $QUERY_COUNT queries → query_logs.json"
+
+# ── 4b. Scheduled vs Ad-hoc Breakdown ─────────────────
+echo "④b Scheduled vs ad-hoc breakdown..."
+bq query --use_legacy_sql=false --format=prettyjson --max_rows=1000 --project_id="$PROJECT_ID" "
+  SELECT
+    CASE
+      WHEN user_email LIKE '%gserviceaccount.com' THEN 'service_account'
+      WHEN EXISTS(SELECT 1 FROM UNNEST(labels) l WHERE l.key IN ('airflow_dag_id', 'dbt_invocation_id', 'scheduled_query_id')) THEN 'scheduled'
+      WHEN job_creation_reason.code = 'REQUESTED' AND priority = 'BATCH' THEN 'batch'
+      ELSE 'ad_hoc'
+    END AS query_source,
+    COUNT(*) AS query_count,
+    ARRAY_AGG(DISTINCT user_email) AS users,
+    ROUND(SUM(total_bytes_processed) / 1e9, 2) AS total_gb_processed,
+    ROUND(SUM(total_slot_ms) / 1000 / 3600, 2) AS total_slot_hours
+  FROM \`$PROJECT_ID\`.\`region-$REGION\`.INFORMATION_SCHEMA.JOBS
+  WHERE
+    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
+    AND job_type = 'QUERY'
+    AND state = 'DONE'
+    AND error_result IS NULL
+  GROUP BY query_source
+  ORDER BY query_count DESC
+" > "$OUTPUT_DIR/query_sources.json"
+echo "   ✓ query_sources.json"
 
 # ── 5. Most Frequent Queries ──────────────────────────
 echo "⑤ Analyzing query frequency..."
@@ -199,8 +231,9 @@ echo "  datasets.json             — all datasets in project"
 echo "  columns.json              — every column + type across all tables"
 echo "  column_descriptions.json  — column descriptions (from COLUMN_FIELD_PATHS)"
 echo "  ddls.json                 — full CREATE TABLE DDLs"
-echo "  query_logs.json       — all queries (30 days)"
-echo "  frequent_queries.json — top queries by frequency (normalized)"
+echo "  query_logs.json           — all queries (30 days) with query_source label"
+echo "  query_sources.json        — scheduled vs ad-hoc vs service_account breakdown"
+echo "  frequent_queries.json     — top queries by frequency (normalized)"
 echo "  table_access.json     — which tables get queried most"
 echo "  user_stats.json       — per-user query volume + cost"
 echo ""
