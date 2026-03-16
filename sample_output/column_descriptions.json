@@ -1,0 +1,626 @@
+[
+  {
+    "column_name": "cmf_rut", 
+    "data_type": "STRING", 
+    "dataset": "analytics", 
+    "description": "CMF regulator RUT", 
+    "field_path": "cmf_rut", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "eom_aum_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": "End of month AUM", 
+    "field_path": "eom_aum_clp", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "eom_investor_count", 
+    "data_type": "INT64", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "eom_investor_count", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "fund_id", 
+    "data_type": "STRING", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "fund_id", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "fund_name", 
+    "data_type": "STRING", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "fund_name", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "generated_at", 
+    "data_type": "TIMESTAMP", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "generated_at", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "management_fee_collected_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "management_fee_collected_clp", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "monthly_deposits_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "monthly_deposits_clp", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "monthly_return_pct", 
+    "data_type": "FLOAT64", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "monthly_return_pct", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "monthly_withdrawals_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "monthly_withdrawals_clp", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "report_month", 
+    "data_type": "DATE", 
+    "dataset": "analytics", 
+    "description": "First day of reporting month", 
+    "field_path": "report_month", 
+    "table_name": "cmf_regulatory_report"
+  }, 
+  {
+    "column_name": "daily_net_flow_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": "Net deposits - withdrawals", 
+    "field_path": "daily_net_flow_clp", 
+    "table_name": "daily_aum"
+  }, 
+  {
+    "column_name": "daily_return_pct", 
+    "data_type": "FLOAT64", 
+    "dataset": "analytics", 
+    "description": "Daily return %", 
+    "field_path": "daily_return_pct", 
+    "table_name": "daily_aum"
+  }, 
+  {
+    "column_name": "fund_id", 
+    "data_type": "STRING", 
+    "dataset": "analytics", 
+    "description": "Fund identifier", 
+    "field_path": "fund_id", 
+    "table_name": "daily_aum"
+  }, 
+  {
+    "column_name": "fund_name", 
+    "data_type": "STRING", 
+    "dataset": "analytics", 
+    "description": "Fund display name", 
+    "field_path": "fund_name", 
+    "table_name": "daily_aum"
+  }, 
+  {
+    "column_name": "investor_count", 
+    "data_type": "INT64", 
+    "dataset": "analytics", 
+    "description": "Number of active investors", 
+    "field_path": "investor_count", 
+    "table_name": "daily_aum"
+  }, 
+  {
+    "column_name": "report_date", 
+    "data_type": "DATE", 
+    "dataset": "analytics", 
+    "description": "Reporting date", 
+    "field_path": "report_date", 
+    "table_name": "daily_aum"
+  }, 
+  {
+    "column_name": "total_aum_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": "Total AUM in CLP", 
+    "field_path": "total_aum_clp", 
+    "table_name": "daily_aum"
+  }, 
+  {
+    "column_name": "total_aum_usd", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": "Total AUM in USD", 
+    "field_path": "total_aum_usd", 
+    "table_name": "daily_aum"
+  }, 
+  {
+    "column_name": "current_value_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "current_value_clp", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "first_investment_date", 
+    "data_type": "DATE", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "first_investment_date", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "fund_id", 
+    "data_type": "STRING", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "fund_id", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "last_transaction_date", 
+    "data_type": "DATE", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "last_transaction_date", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "shares_held", 
+    "data_type": "FLOAT64", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "shares_held", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "snapshot_date", 
+    "data_type": "DATE", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "snapshot_date", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "total_deposited_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "total_deposited_clp", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "total_withdrawn_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "total_withdrawn_clp", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "unrealized_gain_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "unrealized_gain_clp", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "user_id", 
+    "data_type": "STRING", 
+    "dataset": "analytics", 
+    "description": null, 
+    "field_path": "user_id", 
+    "table_name": "user_portfolio"
+  }, 
+  {
+    "column_name": "cmf_rut", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Chilean CMF regulator identifier", 
+    "field_path": "cmf_rut", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "currency", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "ISO 4217 currency code", 
+    "field_path": "currency", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "fund_id", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Unique fund identifier", 
+    "field_path": "fund_id", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "fund_name", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Public fund name", 
+    "field_path": "fund_name", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "fund_type", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "e.g. mutual_fund, etf, money_market", 
+    "field_path": "fund_type", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "inception_date", 
+    "data_type": "DATE", 
+    "dataset": "raw", 
+    "description": "Fund launch date", 
+    "field_path": "inception_date", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "is_active", 
+    "data_type": "BOOL", 
+    "dataset": "raw", 
+    "description": "Whether fund is currently active", 
+    "field_path": "is_active", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "loaded_at", 
+    "data_type": "TIMESTAMP", 
+    "dataset": "raw", 
+    "description": "Ingestion timestamp", 
+    "field_path": "loaded_at", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "management_fee_bps", 
+    "data_type": "INT64", 
+    "dataset": "raw", 
+    "description": "Annual management fee in basis points", 
+    "field_path": "management_fee_bps", 
+    "table_name": "funds"
+  }, 
+  {
+    "column_name": "daily_return_pct", 
+    "data_type": "FLOAT64", 
+    "dataset": "raw", 
+    "description": "Daily return percentage", 
+    "field_path": "daily_return_pct", 
+    "table_name": "nav_history"
+  }, 
+  {
+    "column_name": "fund_id", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Fund identifier", 
+    "field_path": "fund_id", 
+    "table_name": "nav_history"
+  }, 
+  {
+    "column_name": "loaded_at", 
+    "data_type": "TIMESTAMP", 
+    "dataset": "raw", 
+    "description": "Ingestion timestamp", 
+    "field_path": "loaded_at", 
+    "table_name": "nav_history"
+  }, 
+  {
+    "column_name": "nav_date", 
+    "data_type": "DATE", 
+    "dataset": "raw", 
+    "description": "Valuation date", 
+    "field_path": "nav_date", 
+    "table_name": "nav_history"
+  }, 
+  {
+    "column_name": "nav_per_share", 
+    "data_type": "FLOAT64", 
+    "dataset": "raw", 
+    "description": "NAV per share", 
+    "field_path": "nav_per_share", 
+    "table_name": "nav_history"
+  }, 
+  {
+    "column_name": "shares_outstanding", 
+    "data_type": "FLOAT64", 
+    "dataset": "raw", 
+    "description": "Total shares outstanding", 
+    "field_path": "shares_outstanding", 
+    "table_name": "nav_history"
+  }, 
+  {
+    "column_name": "total_aum", 
+    "data_type": "NUMERIC", 
+    "dataset": "raw", 
+    "description": "Total assets under management (CLP)", 
+    "field_path": "total_aum", 
+    "table_name": "nav_history"
+  }, 
+  {
+    "column_name": "amount_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "raw", 
+    "description": "Transaction amount in CLP", 
+    "field_path": "amount_clp", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "amount_usd", 
+    "data_type": "NUMERIC", 
+    "dataset": "raw", 
+    "description": "Transaction amount in USD (if applicable)", 
+    "field_path": "amount_usd", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "fund_id", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Target fund", 
+    "field_path": "fund_id", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "loaded_at", 
+    "data_type": "TIMESTAMP", 
+    "dataset": "raw", 
+    "description": "Ingestion timestamp", 
+    "field_path": "loaded_at", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "nav_at_transaction", 
+    "data_type": "FLOAT64", 
+    "dataset": "raw", 
+    "description": "NAV per share at time of transaction", 
+    "field_path": "nav_at_transaction", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "shares", 
+    "data_type": "FLOAT64", 
+    "dataset": "raw", 
+    "description": "Number of fund shares", 
+    "field_path": "shares", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "source_system", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Originating system", 
+    "field_path": "source_system", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "status", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "pending, settled, cancelled", 
+    "field_path": "status", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "transaction_date", 
+    "data_type": "DATE", 
+    "dataset": "raw", 
+    "description": "Settlement date", 
+    "field_path": "transaction_date", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "transaction_id", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Unique transaction ID", 
+    "field_path": "transaction_id", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "transaction_type", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "deposit, withdrawal, switch_in, switch_out", 
+    "field_path": "transaction_type", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "user_id", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Investor user ID", 
+    "field_path": "user_id", 
+    "table_name": "transactions"
+  }, 
+  {
+    "column_name": "country_code", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "ISO 3166-1 alpha-2", 
+    "field_path": "country_code", 
+    "table_name": "users"
+  }, 
+  {
+    "column_name": "email_hash", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Hashed email (PII masked)", 
+    "field_path": "email_hash", 
+    "table_name": "users"
+  }, 
+  {
+    "column_name": "is_qualified_investor", 
+    "data_type": "BOOL", 
+    "dataset": "raw", 
+    "description": "Chilean qualified investor flag", 
+    "field_path": "is_qualified_investor", 
+    "table_name": "users"
+  }, 
+  {
+    "column_name": "kyc_status", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "pending, approved, rejected", 
+    "field_path": "kyc_status", 
+    "table_name": "users"
+  }, 
+  {
+    "column_name": "loaded_at", 
+    "data_type": "TIMESTAMP", 
+    "dataset": "raw", 
+    "description": "Ingestion timestamp", 
+    "field_path": "loaded_at", 
+    "table_name": "users"
+  }, 
+  {
+    "column_name": "registration_date", 
+    "data_type": "DATE", 
+    "dataset": "raw", 
+    "description": "Account creation date", 
+    "field_path": "registration_date", 
+    "table_name": "users"
+  }, 
+  {
+    "column_name": "risk_profile", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "conservative, moderate, aggressive", 
+    "field_path": "risk_profile", 
+    "table_name": "users"
+  }, 
+  {
+    "column_name": "user_id", 
+    "data_type": "STRING", 
+    "dataset": "raw", 
+    "description": "Unique user identifier", 
+    "field_path": "user_id", 
+    "table_name": "users"
+  }, 
+  {
+    "column_name": "amount_clp", 
+    "data_type": "NUMERIC", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "amount_clp", 
+    "table_name": "stg_transactions"
+  }, 
+  {
+    "column_name": "fund_id", 
+    "data_type": "STRING", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "fund_id", 
+    "table_name": "stg_transactions"
+  }, 
+  {
+    "column_name": "loaded_at", 
+    "data_type": "TIMESTAMP", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "loaded_at", 
+    "table_name": "stg_transactions"
+  }, 
+  {
+    "column_name": "shares", 
+    "data_type": "FLOAT64", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "shares", 
+    "table_name": "stg_transactions"
+  }, 
+  {
+    "column_name": "transaction_date", 
+    "data_type": "DATE", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "transaction_date", 
+    "table_name": "stg_transactions"
+  }, 
+  {
+    "column_name": "transaction_id", 
+    "data_type": "STRING", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "transaction_id", 
+    "table_name": "stg_transactions"
+  }, 
+  {
+    "column_name": "transaction_type", 
+    "data_type": "STRING", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "transaction_type", 
+    "table_name": "stg_transactions"
+  }, 
+  {
+    "column_name": "user_id", 
+    "data_type": "STRING", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "user_id", 
+    "table_name": "stg_transactions"
+  }, 
+  {
+    "column_name": "country_code", 
+    "data_type": "STRING", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "country_code", 
+    "table_name": "stg_users"
+  }, 
+  {
+    "column_name": "is_qualified_investor", 
+    "data_type": "BOOL", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "is_qualified_investor", 
+    "table_name": "stg_users"
+  }, 
+  {
+    "column_name": "registration_date", 
+    "data_type": "DATE", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "registration_date", 
+    "table_name": "stg_users"
+  }, 
+  {
+    "column_name": "risk_profile", 
+    "data_type": "STRING", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "risk_profile", 
+    "table_name": "stg_users"
+  }, 
+  {
+    "column_name": "user_id", 
+    "data_type": "STRING", 
+    "dataset": "staging", 
+    "description": null, 
+    "field_path": "user_id", 
+    "table_name": "stg_users"
+  }
+]

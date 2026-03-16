@@ -1,10 +1,50 @@
 [
   {
+    "avg_bytes": "3.145728E7", 
+    "avg_slot_ms": "123.0", 
+    "execution_count": "2", 
+    "query_hash": "ec9ed9cd31f3cba7cac0f72b75eb66dd7d7da58b608cb8215d55f04e1fe4270e", 
+    "sample_query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
+    "users": [
+      "alen@velum-labs.com"
+    ]
+  }, 
+  {
+    "avg_bytes": "3.145728E7", 
+    "avg_slot_ms": "259.0", 
+    "execution_count": "2", 
+    "query_hash": "90caf8c023fa962f36a5444f9d618679f1fc20f9f02684b6d188b578807743be", 
+    "sample_query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
+    "users": [
+      "alen@velum-labs.com"
+    ]
+  }, 
+  {
     "avg_bytes": "0.0", 
-    "avg_slot_ms": "521.0", 
-    "execution_count": "1", 
+    "avg_slot_ms": "523.0", 
+    "execution_count": "2", 
     "query_hash": "436756efa3ff1543e5874bd7391eb86441210506649ab87737af95e8204786a6", 
     "sample_query": "\n  SELECT\n    job_id,\n    user_email,\n    query,\n    statement_type,\n    creation_time,\n    TIMESTAMP_DIFF(end_time, start_time, SECOND) AS duration_seconds,\n    total_bytes_processed,\n    total_bytes_billed,\n    total_slot_ms,\n    cache_hit,\n    referenced_tables\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  ORDER BY creation_time DESC\n", 
+    "users": [
+      "alen@velum-labs.com"
+    ]
+  }, 
+  {
+    "avg_bytes": "1.048576E7", 
+    "avg_slot_ms": "39.0", 
+    "execution_count": "1", 
+    "query_hash": "2e6280a6c4802d2da6a41a0f2db2d1c2a3a1f66673f38eb5ebb216446d9bc40f", 
+    "sample_query": "SELECT table_name, column_name, field_path, description, data_type FROM alma-bq-demo-2026.raw.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS WHERE description IS NOT NULL AND description != '' LIMIT 5", 
+    "users": [
+      "alen@velum-labs.com"
+    ]
+  }, 
+  {
+    "avg_bytes": "3.145728E7", 
+    "avg_slot_ms": "152.0", 
+    "execution_count": "1", 
+    "query_hash": "50497a05b1d24ba8bb1f2811755d4c2fe02e781f9e0c563b9335ec6cf23335b7", 
+    "sample_query": "SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS ORDER BY dataset, table_name, column_name", 
     "users": [
       "alen@velum-labs.com"
     ]
@@ -30,21 +70,31 @@
     ]
   }, 
   {
-    "avg_bytes": "3.145728E7", 
-    "avg_slot_ms": "153.0", 
+    "avg_bytes": "0.0", 
+    "avg_slot_ms": "570.0", 
     "execution_count": "1", 
-    "query_hash": "90caf8c023fa962f36a5444f9d618679f1fc20f9f02684b6d188b578807743be", 
-    "sample_query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
+    "query_hash": "5caee14bee63fd3c4e1059ffae1a97d1175711891424ca3f476e7de37364c697", 
+    "sample_query": "\n  SELECT\n    ref.dataset_id,\n    ref.table_id,\n    COUNT(*) AS query_count,\n    COUNT(DISTINCT user_email) AS distinct_users,\n    MIN(creation_time) AS first_accessed,\n    MAX(creation_time) AS last_accessed\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS,\n    UNNEST(referenced_tables) AS ref\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  GROUP BY ref.dataset_id, ref.table_id\n  ORDER BY query_count DESC\n", 
     "users": [
       "alen@velum-labs.com"
     ]
   }, 
   {
-    "avg_bytes": "3.145728E7", 
-    "avg_slot_ms": "116.0", 
+    "avg_bytes": "0.0", 
+    "avg_slot_ms": "507.0", 
     "execution_count": "1", 
-    "query_hash": "ec9ed9cd31f3cba7cac0f72b75eb66dd7d7da58b608cb8215d55f04e1fe4270e", 
-    "sample_query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
+    "query_hash": "7dc43a3c3545562a87c26974ce9dfbead40d3776e110754e755cd71453e9d920", 
+    "sample_query": "\n  SELECT\n    user_email,\n    COUNT(*) AS query_count,\n    COUNTIF(statement_type = 'SELECT') AS select_count,\n    COUNTIF(statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')) AS dml_count,\n    ROUND(SUM(total_bytes_processed) / 1e9, 2) AS total_gb_processed,\n    ROUND(SUM(total_slot_ms) / 1000 / 3600, 2) AS total_slot_hours\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n  GROUP BY user_email\n  ORDER BY query_count DESC\n", 
+    "users": [
+      "alen@velum-labs.com"
+    ]
+  }, 
+  {
+    "avg_bytes": "0.0", 
+    "avg_slot_ms": "609.0", 
+    "execution_count": "1", 
+    "query_hash": "37c64585a44e1f3a29087246baa114a5cc51a6f5f3b0eb32f2cc49566ca411c4", 
+    "sample_query": "\n  SELECT\n    query_info.query_hashes.normalized_literals AS query_hash,\n    COUNT(*) AS execution_count,\n    ARRAY_AGG(query LIMIT 1)[OFFSET(0)] AS sample_query,\n    ARRAY_AGG(DISTINCT user_email) AS users,\n    ROUND(AVG(total_bytes_processed), 0) AS avg_bytes,\n    ROUND(AVG(total_slot_ms), 0) AS avg_slot_ms\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n    AND query_info.query_hashes.normalized_literals IS NOT NULL\n  GROUP BY query_hash\n  ORDER BY execution_count DESC\n  LIMIT 100\n", 
     "users": [
       "alen@velum-labs.com"
     ]

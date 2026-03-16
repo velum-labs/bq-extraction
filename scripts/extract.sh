@@ -56,6 +56,19 @@ fi
 COL_COUNT=$(python3 -c "import json; print(len(json.load(open('$OUTPUT_DIR/columns.json'))))" 2>/dev/null || echo "?")
 echo "   ✓ $COL_COUNT columns → columns.json"
 
+# ── 2b. Column Descriptions (via COLUMN_FIELD_PATHS) ──
+echo "②b Extracting column descriptions..."
+DATASETS=${DATASETS:-$(bq ls --project_id "$PROJECT_ID" --format=json 2>/dev/null | python3 -c "import json,sys; [print(d['datasetReference']['datasetId']) for d in json.load(sys.stdin)]")}
+UNION_SQL=""
+for DS in $DATASETS; do
+  [ -n "$UNION_SQL" ] && UNION_SQL="$UNION_SQL UNION ALL "
+  UNION_SQL="${UNION_SQL}SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM \`$PROJECT_ID\`.\`$DS\`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
+done
+bq query --use_legacy_sql=false --format=prettyjson --max_rows=200000 --project_id="$PROJECT_ID" \
+  "$UNION_SQL ORDER BY dataset, table_name, column_name" > "$OUTPUT_DIR/column_descriptions.json" 2>/dev/null || echo "[]" > "$OUTPUT_DIR/column_descriptions.json"
+DESC_COUNT=$(python3 -c "import json; d=json.load(open('$OUTPUT_DIR/column_descriptions.json')); print(sum(1 for r in d if r.get('description')))" 2>/dev/null || echo "?")
+echo "   ✓ $DESC_COUNT described columns → column_descriptions.json"
+
 # ── 3. Full DDLs ───────────────────────────────────────
 echo "③ Extracting DDLs (CREATE TABLE statements)..."
 if bq query --use_legacy_sql=false --format=prettyjson --max_rows=10000 --project_id="$PROJECT_ID" "
@@ -182,9 +195,10 @@ echo ""
 ls -lh "$OUTPUT_DIR/"
 echo ""
 echo "Files:"
-echo "  datasets.json         — all datasets in project"
-echo "  columns.json          — every column + type across all tables"
-echo "  ddls.json             — full CREATE TABLE DDLs"
+echo "  datasets.json             — all datasets in project"
+echo "  columns.json              — every column + type across all tables"
+echo "  column_descriptions.json  — column descriptions (from COLUMN_FIELD_PATHS)"
+echo "  ddls.json                 — full CREATE TABLE DDLs"
 echo "  query_logs.json       — all queries (30 days)"
 echo "  frequent_queries.json — top queries by frequency (normalized)"
 echo "  table_access.json     — which tables get queried most"
