@@ -86,6 +86,9 @@ class GeneratedOutput:
     row_count: int
 
 
+STEP_COUNT = 4
+
+
 def build_logger(*, quiet: bool) -> logging.Logger:
     logger = logging.getLogger("bq_extraction_demo")
     logger.handlers.clear()
@@ -114,7 +117,15 @@ def canonical_query_location(location: str) -> str:
 
 
 def format_error(exc: Exception) -> str:
-    return str(exc).splitlines()[0]
+    message = str(exc).strip()
+    if not message:
+        return exc.__class__.__name__
+    return message.splitlines()[0]
+
+
+def format_row_count(row_count: int) -> str:
+    suffix = "row" if row_count == 1 else "rows"
+    return f"{row_count} {suffix}"
 
 
 class ExtractionRunner:
@@ -133,7 +144,7 @@ class ExtractionRunner:
         if not self.config.dry_run:
             self._prepare_output_dir()
 
-        self._log_banner()
+        self._log_header()
         snapshot = self._discover_snapshot()
         outputs: list[GeneratedOutput] = []
         outputs.extend(self._extract_api_families(snapshot))
@@ -154,13 +165,13 @@ class ExtractionRunner:
         return self.config.output_dir
 
     def _discover_snapshot(self) -> DiscoverySnapshot:
-        self.logger.info("① Discovering datasets...")
+        self._log_step(1, "Discover datasets")
         try:
             datasets = self.service.list_datasets(
                 include_hidden=self.config.include_hidden_datasets
             )
         except Exception as exc:
-            self.logger.warning(f"   ! dataset discovery unavailable: {format_error(exc)}")
+            self._warn(f"dataset discovery unavailable: {format_error(exc)}")
             datasets = []
 
         filtered = [
@@ -171,9 +182,9 @@ class ExtractionRunner:
         ]
 
         if filtered:
-            self.logger.info(f"   ✓ {len(filtered)} datasets discovered")
+            self._ok(f"{len(filtered)} datasets discovered")
         else:
-            self.logger.info("   ↷ no datasets discovered")
+            self._skip("no datasets discovered")
 
         location_map: dict[str, list[DatasetDiscovery]] = defaultdict(list)
         for dataset in filtered:
@@ -193,14 +204,14 @@ class ExtractionRunner:
         return DiscoverySnapshot(datasets=tuple(filtered), locations=locations)
 
     def _extract_api_families(self, snapshot: DiscoverySnapshot) -> list[GeneratedOutput]:
-        self.logger.info("② Extracting API-backed object families...")
+        self._log_step(2, "Extract API-backed object families")
         outputs: list[GeneratedOutput] = []
 
         for family in OBJECT_FAMILIES:
             if family.key == "jobs":
                 continue
             if not self.config.wants_family(family.key):
-                self.logger.info(f"   ↷ {family.key}: excluded by family selection")
+                self._skip(f"{family.key}: excluded by family selection")
                 continue
 
             output_path = self.config.output_dir / family_output_name(
@@ -208,11 +219,11 @@ class ExtractionRunner:
                 self.config.output_extension,
             )
             if self.config.dry_run:
-                self.logger.info(f"   [dry-run] -> {output_path}")
+                self._detail(f"would write {output_path}")
                 if family.key == "datasets":
-                    self.logger.info(f"   discovered datasets: {len(snapshot.datasets)}")
+                    self._detail(f"discovered datasets: {len(snapshot.datasets)}")
                 else:
-                    self.logger.info(f"   datasets in scope: {len(snapshot.datasets)}")
+                    self._detail(f"datasets in scope: {len(snapshot.datasets)}")
                 continue
 
             rows = self._collect_family_rows(family.key, snapshot)
@@ -221,7 +232,7 @@ class ExtractionRunner:
                 output_format=self.config.output_format,
                 rows=rows,
             )
-            self.logger.info(f"   ✓ {len(rows)} {family.key} rows -> {output_path.name}")
+            self._ok(f"wrote {output_path.name} ({format_row_count(len(rows))})")
             outputs.append(
                 GeneratedOutput(
                     key=family.key,
@@ -251,8 +262,8 @@ class ExtractionRunner:
                 else:
                     raise ValueError(f"unknown family key: {family_key}")
             except Exception as exc:
-                self.logger.warning(
-                    f"   ! {family_key}: could not enumerate {dataset.qualified_id}: {format_error(exc)}"
+                self._warn(
+                    f"{family_key}: could not enumerate {dataset.qualified_id}: {format_error(exc)}"
                 )
         return rows
 
@@ -260,17 +271,17 @@ class ExtractionRunner:
         self,
         snapshot: DiscoverySnapshot,
     ) -> tuple[list[CapabilityPlan], list[str]]:
-        self.logger.info("③ Probing metadata capabilities...")
+        self._log_step(3, "Probe metadata capabilities")
         plans: list[CapabilityPlan] = []
         unavailable: list[str] = []
 
         for spec in CAPABILITY_SPECS:
             if not self.config.wants_source(spec.key):
-                self.logger.info(f"   ↷ {spec.key}: excluded by source selection")
+                self._skip(f"{spec.key}: excluded by source selection")
                 continue
             if not snapshot.locations:
                 message = f"{spec.key}: no locations discovered"
-                self.logger.info(f"   ↷ {message}")
+                self._skip(message)
                 unavailable.append(message)
                 continue
 
@@ -279,10 +290,10 @@ class ExtractionRunner:
                     plan = self._probe_capability(spec, location_group)
                     plans.append(plan)
                     mode_label = "dataset scope" if plan.use_dataset_scope else "region scope"
-                    self.logger.info(f"   ✓ {spec.key} @ {plan.location} ({mode_label})")
+                    self._ok(f"{spec.key} @ {plan.location} ({mode_label})")
                 except Exception as exc:
                     message = f"{spec.key} @ {location_group.location}: {format_error(exc)}"
-                    self.logger.info(f"   ↷ unavailable: {message}")
+                    self._skip(message)
                     unavailable.append(message)
 
         return plans, unavailable
@@ -340,7 +351,7 @@ class ExtractionRunner:
             raise RuntimeError(detail) from region_exc
 
     def _extract_capabilities(self, plans: list[CapabilityPlan]) -> list[GeneratedOutput]:
-        self.logger.info("④ Extracting discovered metadata capabilities...")
+        self._log_step(4, "Extract discovered metadata capabilities")
         rows_by_key: dict[str, list[dict[str, Any]]] = defaultdict(list)
         field_names_by_key: dict[str, list[str]] = {}
 
@@ -348,8 +359,8 @@ class ExtractionRunner:
             try:
                 rows, field_names = self._run_capability(plan)
             except Exception as exc:
-                self.logger.warning(
-                    f"   ! {plan.spec.key} @ {plan.location}: extraction failed: {format_error(exc)}"
+                self._warn(
+                    f"{plan.spec.key} @ {plan.location}: extraction failed: {format_error(exc)}"
                 )
                 continue
 
@@ -379,7 +390,7 @@ class ExtractionRunner:
                 rows=rows,
                 field_names=field_names_by_key.get(spec.key) or derive_field_names(rows),
             )
-            self.logger.info(f"   ✓ {len(rows)} rows -> {output_path.name}")
+            self._ok(f"wrote {output_path.name} ({format_row_count(len(rows))})")
             outputs.append(
                 GeneratedOutput(
                     key=spec.key,
@@ -431,8 +442,8 @@ class ExtractionRunner:
                     location=plan.query_location,
                 )
             except Exception as exc:
-                self.logger.warning(
-                    f"   ! {plan.spec.key} @ {plan.location}: dataset {dataset_id} failed: {format_error(exc)}"
+                self._warn(
+                    f"{plan.spec.key} @ {plan.location}: dataset {dataset_id} failed: {format_error(exc)}"
                 )
                 continue
 
@@ -457,34 +468,48 @@ class ExtractionRunner:
             raise RuntimeError(f"output path is not a directory: {self.config.output_dir}")
         self.config.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _log_banner(self) -> None:
+    def _log_header(self) -> None:
         if self.config.quiet:
             return
-        self.logger.info("╔══════════════════════════════════════════════════════╗")
-        self.logger.info(f"║  {'BigQuery Discovery Extractor':<52}║")
-        self.logger.info(f"║  {'Project:  ' + self.config.project_id:<52}║")
-        locations = ",".join(self.config.location_filters) if self.config.location_filters else "auto-discover"
-        self.logger.info(f"║  {'Locations: ' + locations:<52}║")
-        self.logger.info(f"║  {'Days:     ' + str(self.config.days):<52}║")
-        self.logger.info(f"║  {'Output:   ' + str(self.config.output_dir) + '/':<52}║")
+        self.logger.info("BigQuery Discovery Extractor")
+        self.logger.info(f"Project: {self.config.project_id}")
+        locations = ", ".join(self.config.location_filters) if self.config.location_filters else "auto-discover"
+        self.logger.info(f"Locations: {locations}")
+        self.logger.info(f"Days: {self.config.days}")
+        self.logger.info(f"Output: {self.config.output_dir}")
         if self.config.dry_run:
-            self.logger.info(f"║  {'*** DRY RUN - no output files will be written ***':<52}║")
-        self.logger.info("╚══════════════════════════════════════════════════════╝")
-        self.logger.info("")
+            self.logger.info("Mode: dry run")
 
     def _log_summary(self, outputs: list[GeneratedOutput], unavailable: list[str]) -> None:
         self.logger.info("")
-        self.logger.info("═══════════════════════════════════════════════════════")
-        self.logger.info("  EXTRACTION COMPLETE")
-        self.logger.info("═══════════════════════════════════════════════════════")
-        self.logger.info("")
-        self.logger.info("Output files:")
-        for output in outputs:
-            self.logger.info(f"  {output.path.name} ({output.row_count} rows)")
+        self.logger.info("Extraction complete")
+        self.logger.info(f"Output directory: {self.config.output_dir}")
+        self.logger.info("Generated files:")
+        if outputs:
+            for output in outputs:
+                self._detail(f"{output.path.name} ({format_row_count(output.row_count)})")
+        else:
+            self._detail("none")
         if unavailable:
             self.logger.info("")
-            self.logger.info("Skipped or unavailable:")
+            self.logger.info("Unavailable metadata:")
             for item in unavailable:
-                self.logger.info(f"  {item}")
+                self._detail(item)
+
+    def _log_step(self, step_number: int, title: str) -> None:
+        self.logger.info("")
+        self.logger.info(f"Step {step_number}/{STEP_COUNT}: {title}")
+
+    def _detail(self, message: str) -> None:
+        self.logger.info(f"  - {message}")
+
+    def _ok(self, message: str) -> None:
+        self.logger.info(f"  OK {message}")
+
+    def _skip(self, message: str) -> None:
+        self.logger.info(f"  SKIP {message}")
+
+    def _warn(self, message: str) -> None:
+        self.logger.warning(f"WARN {message}")
 
 

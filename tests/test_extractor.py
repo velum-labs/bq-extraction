@@ -171,10 +171,35 @@ def test_dry_run_discovers_and_probes_without_writing_output_dir(tmp_path: Path,
 
     captured = capsys.readouterr()
     assert not config.output_dir.exists()
-    assert "[dry-run] ->" in captured.out
-    assert "tables.ddls @ US (region scope)" in captured.out
+    assert "Mode: dry run" in captured.out
+    assert f"  - would write {config.output_dir / 'datasets.json'}" in captured.out
+    assert "  OK tables.ddls @ US (region scope)" in captured.out
     assert "Dry run complete. No output files were written." in captured.out
     assert service.probes
+
+
+def test_standard_run_logs_header_steps_and_summary(tmp_path: Path, capsys) -> None:
+    config = make_config(
+        tmp_path,
+        include_families=frozenset({"datasets", "tables"}),
+        include_sources=frozenset({"tables.ddls"}),
+        exclude_families=frozenset({"routines", "models", "jobs"}),
+    )
+
+    runner = ExtractionRunner(config, service=FakeService())
+    runner.run()
+
+    captured = capsys.readouterr()
+    assert "BigQuery Discovery Extractor" in captured.out
+    assert "Project: demo-project" in captured.out
+    assert "Step 1/4: Discover datasets" in captured.out
+    assert "Step 2/4: Extract API-backed object families" in captured.out
+    assert "Step 3/4: Probe metadata capabilities" in captured.out
+    assert "Step 4/4: Extract discovered metadata capabilities" in captured.out
+    assert "  OK wrote datasets.json (2 rows)" in captured.out
+    assert "Extraction complete" in captured.out
+    assert "Generated files:" in captured.out
+    assert captured.err == ""
 
 
 def test_quiet_mode_prints_only_output_dir(tmp_path: Path, capsys) -> None:
@@ -192,6 +217,24 @@ def test_quiet_mode_prints_only_output_dir(tmp_path: Path, capsys) -> None:
     assert config.output_dir.exists()
     assert captured.out.strip() == str(config.output_dir)
     assert captured.err == ""
+    assert (config.output_dir / "datasets.json").exists()
+
+
+def test_dataset_discovery_warning_is_sent_to_stderr(tmp_path: Path, capsys) -> None:
+    config = make_config(
+        tmp_path,
+        include_families=frozenset({"datasets"}),
+        exclude_families=frozenset({"tables", "routines", "models", "jobs"}),
+    )
+    service = FakeService()
+    service.fail_dataset_discovery = True
+
+    runner = ExtractionRunner(config, service=service)
+    runner.run()
+
+    captured = capsys.readouterr()
+    assert "WARN dataset discovery unavailable: dataset discovery failed" in captured.err
+    assert "  SKIP no datasets discovered" in captured.out
     assert (config.output_dir / "datasets.json").exists()
 
 

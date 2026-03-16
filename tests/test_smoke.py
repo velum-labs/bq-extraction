@@ -32,6 +32,26 @@ def test_cli_dry_run_smoke(tmp_path: Path) -> None:
     assert not (tmp_path / "dry-run-output").exists()
 
 
+def test_cli_reports_extraction_failures_to_stderr(tmp_path: Path) -> None:
+    output_path = tmp_path / "not-a-directory"
+    output_path.write_text("placeholder", encoding="utf-8")
+    command = [
+        "uv",
+        "run",
+        "python",
+        "scripts/extract.py",
+        "--project",
+        "demo-project",
+        "--output-dir",
+        str(output_path),
+    ]
+
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 1
+    assert "Extraction failed: output path is not a directory:" in result.stderr
+
+
 @pytest.mark.skipif(
     not os.environ.get("BQ_EXTRACTION_SMOKE_PROJECT"),
     reason="set BQ_EXTRACTION_SMOKE_PROJECT to run the live smoke test",
