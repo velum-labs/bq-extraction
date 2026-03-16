@@ -23,7 +23,7 @@ def test_bigquery_service_passes_query_location() -> None:
 def test_list_datasets_forwards_include_hidden_flag() -> None:
     dataset_item = Mock()
     dataset_item.dataset_id = "analytics"
-    dataset_item.to_api_repr.return_value = {
+    dataset_item._properties = {
         "datasetReference": {"projectId": "demo-project", "datasetId": "analytics"},
         "location": "US",
     }

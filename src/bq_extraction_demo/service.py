@@ -41,7 +41,9 @@ class BigQueryService:
         )
         discoveries: list[DatasetDiscovery] = []
         for dataset in dataset_items:
-            payload = normalize_api_resource(dataset.to_api_repr())
+            # list_datasets returns DatasetListItem which has _properties but not to_api_repr
+            raw = getattr(dataset, '_properties', None) or {}
+            payload = normalize_api_resource(raw)
             reference = payload.get("datasetReference", {})
             discoveries.append(
                 DatasetDiscovery(
@@ -99,7 +101,9 @@ class BigQueryService:
     def run_query(self, sql: str, max_rows: int, *, location: str) -> QueryResult:
         query_job = self._client.query(sql, location=location)
         row_iterator = query_job.result(max_results=max_rows)
-        field_names = tuple(field.name for field in query_job.schema)
+        # schema can come from query_job or row_iterator
+        schema = query_job.schema or getattr(row_iterator, 'schema', None) or []
+        field_names = tuple(field.name for field in schema)
         rows = [self._normalize_row(row, field_names) for row in row_iterator]
         return QueryResult(field_names=field_names, rows=rows)
 
