@@ -4,9 +4,10 @@
 # Usage: ./seed_queries.sh <project-id>
 set -euo pipefail
 
-PROJECT_ID="${1:?Usage: $0 <project-id>}"
+PROJECT_ID="${1:?Usage: $0 <project-id> [region]}"
+REGION="${2:-US}"
 
-echo "Seeding query traffic into $PROJECT_ID ..."
+echo "Seeding query traffic into $PROJECT_ID (region: $REGION) ..."
 echo "(These populate INFORMATION_SCHEMA.JOBS for the extraction demo)"
 echo ""
 
@@ -20,10 +21,10 @@ run_query() {
 
 # ── Dashboard-style queries (Grafana / Metabase) ──
 
-run_query "Dashboard: Total AUM by fund (today)" '
+run_query "Dashboard: Total AUM by fund (latest)" '
 SELECT fund_name, total_aum_clp, daily_return_pct
 FROM `'"$PROJECT_ID"'.analytics.daily_aum`
-WHERE report_date = CURRENT_DATE()
+WHERE report_date = (SELECT MAX(report_date) FROM `'"$PROJECT_ID"'.analytics.daily_aum`)
 ORDER BY total_aum_clp DESC
 '
 
@@ -135,13 +136,13 @@ WHERE report_month = "2026-02-01"
 
 run_query "Meta: table listing" '
 SELECT table_schema, table_name, table_type
-FROM `'"$PROJECT_ID"'.`region-US`.INFORMATION_SCHEMA.TABLES
+FROM `'"$PROJECT_ID"'.`region-'"$REGION"'`.INFORMATION_SCHEMA.TABLES
 ORDER BY table_schema, table_name
 '
 
 run_query "Meta: column listing" '
 SELECT table_schema, table_name, column_name, data_type
-FROM `'"$PROJECT_ID"'.`region-US`.INFORMATION_SCHEMA.COLUMNS
+FROM `'"$PROJECT_ID"'.`region-'"$REGION"'`.INFORMATION_SCHEMA.COLUMNS
 ORDER BY table_schema, table_name, ordinal_position
 LIMIT 100
 '

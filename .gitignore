@@ -1,0 +1,17 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+
+# SA keys (never commit)
+*.json.key
+sa-key*.json
+
+# Extraction output
+scripts/output/
+output/
+
+# OS
+.DS_Store

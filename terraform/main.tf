@@ -10,7 +10,20 @@ terraform {
 
 provider "google" {
   project = var.project_id
-  region  = var.region
+}
+
+# ──────────────────────────────────────────────
+# Enable required APIs
+# ──────────────────────────────────────────────
+
+resource "google_project_service" "bigquery" {
+  service            = "bigquery.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "iam" {
+  service            = "iam.googleapis.com"
+  disable_on_destroy = false
 }
 
 # ──────────────────────────────────────────────
@@ -21,6 +34,8 @@ resource "google_bigquery_dataset" "raw" {
   dataset_id  = "raw"
   description = "Raw ingested data from source systems"
   location    = var.region
+
+  depends_on = [google_project_service.bigquery]
 
   labels = {
     layer = "raw"
@@ -33,6 +48,8 @@ resource "google_bigquery_dataset" "staging" {
   description = "Cleaned and transformed staging models"
   location    = var.region
 
+  depends_on = [google_project_service.bigquery]
+
   labels = {
     layer = "staging"
     demo  = "alma-extraction"
@@ -43,6 +60,8 @@ resource "google_bigquery_dataset" "analytics" {
   dataset_id  = "analytics"
   description = "Business-ready analytics models"
   location    = var.region
+
+  depends_on = [google_project_service.bigquery]
 
   labels = {
     layer = "analytics"
@@ -263,6 +282,8 @@ resource "google_service_account" "extractor" {
   account_id   = "alma-extractor"
   display_name = "Alma Schema Extractor (demo)"
   description  = "Minimum permissions needed to extract schemas + query logs"
+
+  depends_on = [google_project_service.iam]
 }
 
 resource "google_project_iam_member" "extractor_data_viewer" {

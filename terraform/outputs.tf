@@ -29,12 +29,12 @@ output "extractor_service_account" {
 
 output "extraction_command" {
   description = "Run this to extract schemas + query logs"
-  value       = "./scripts/extract.sh ${var.project_id} ${lower(var.region)}"
+  value       = "./scripts/extract.sh ${var.project_id} ${var.region}"
 }
 
 output "extraction_as_sa_command" {
   description = "Run extraction as the minimal-permissions service account"
-  value       = var.create_service_account ? "gcloud auth activate-service-account --key-file=<(terraform output -raw extractor_sa_key | base64 -d) && ./scripts/extract.sh ${var.project_id} ${lower(var.region)}" : "n/a"
+  value       = var.create_service_account ? "terraform output -raw extractor_sa_key | base64 -d > /tmp/alma-sa-key.json && gcloud auth activate-service-account --key-file=/tmp/alma-sa-key.json && ./scripts/extract.sh ${var.project_id} ${var.region} && rm /tmp/alma-sa-key.json" : "n/a"
 }
 
 output "extractor_sa_key" {

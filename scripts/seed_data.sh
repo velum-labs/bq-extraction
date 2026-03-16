@@ -7,6 +7,17 @@ PROJECT_ID="${1:?Usage: $0 <project-id>}"
 
 echo "Seeding demo data into $PROJECT_ID ..."
 
+# Truncate all tables first (idempotent — safe to re-run)
+echo "→ Truncating existing data..."
+for TABLE in raw.funds raw.users raw.nav_history raw.transactions \
+             staging.stg_transactions staging.stg_users \
+             analytics.daily_aum analytics.user_portfolio analytics.cmf_regulatory_report; do
+  bq query --use_legacy_sql=false --project_id="$PROJECT_ID" \
+    "TRUNCATE TABLE \`$PROJECT_ID.$TABLE\`" > /dev/null 2>&1 || true
+done
+echo "   ✓ Tables truncated"
+echo ""
+
 # ── Raw: Funds ──────────────────────────────────
 echo "→ raw.funds"
 bq query --use_legacy_sql=false --project_id="$PROJECT_ID" '
@@ -112,7 +123,7 @@ INSERT INTO `'"$PROJECT_ID"'.analytics.user_portfolio`
 VALUES
   ("U001", "F001", 5200.00, 7925424, 8000000, 2000000, -74576, "2020-06-15", "2026-03-14", "2026-03-15"),
   ("U001", "F002", 4300.00, 10062473, 10000000, 0, 62473, "2021-01-10", "2026-03-14", "2026-03-15"),
-  ("U002", "F003", 8500.00, 38507870, 35000000, 0, 3507870, "2020-08-22", "2026-03-14", "2026-03-15"),
+  ("U002", "F003", 8500.00, 38506870, 35000000, 0, 3506870, "2020-08-22", "2026-03-14", "2026-03-15"),
   ("U002", "F004", 2056.31, 8018653, 8000000, 0, 18653, "2026-03-15", "2026-03-15", "2026-03-15"),
   ("U003", "F005", 14981.55, 15001686, 15000000, 0, 1686, "2026-03-15", "2026-03-15", "2026-03-15")
 '

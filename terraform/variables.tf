@@ -4,7 +4,13 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "BigQuery dataset region"
+  description = "BigQuery dataset region (e.g. US, EU, us-central1). Used as-is for dataset location."
+  type        = string
+  default     = "US"
+}
+
+variable "region_slug" {
+  description = "Region slug for INFORMATION_SCHEMA queries (lowercase, e.g. 'us', 'eu', 'us-central1'). Must match dataset location."
   type        = string
   default     = "US"
 }
