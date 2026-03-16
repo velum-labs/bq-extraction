@@ -10,8 +10,16 @@
 sa-key*.json
 
 # Extraction output
-scripts/output/
 output/
+
+# Python
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
 
 # OS
 .DS_Store

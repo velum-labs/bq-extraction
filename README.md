@@ -1,6 +1,6 @@
 # BQ Schema & Query Log Extraction — Demo Environment
 
-Reproducible demo: provisions a BigQuery project with realistic fintech schemas, seeds sample data + query traffic, then runs the extraction scripts to produce actual output.
+Reproducible demo: provisions a BigQuery project with realistic fintech schemas, seeds sample data + query traffic, then runs the extraction tooling to produce actual output.
 
 ## What This Proves
 
@@ -12,6 +12,9 @@ Reproducible demo: provisions a BigQuery project with realistic fintech schemas,
 ## Prerequisites
 
 ```bash
+# uv (manages Python + dependencies for the extractor)
+brew install uv
+
 # gcloud CLI
 brew install google-cloud-sdk   # or: curl https://sdk.cloud.google.com | bash
 
@@ -26,27 +29,32 @@ gcloud auth application-default login
 ## Quick Start
 
 ```bash
-# 1. Provision
+# 1. Install Python dependencies for the extractor
+uv sync
+
+# 2. Provision
 cd terraform
 cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars with your project ID
 terraform init
 terraform apply
 
-# 2. Seed data + query traffic
+# 3. Seed data + query traffic
 cd ../scripts
 ./seed_data.sh <project-id>
 ./seed_queries.sh <project-id>
 
-# 3. Run extraction (the thing we're demoing)
-./extract.sh <project-id> us
+# 4. Run extraction (the thing we're demoing)
+cd ..
+uv run python scripts/extract.py --project <project-id> --region us
 
-# 4. Check output
+# 5. Check output
 ls -lh output/
-cat output/columns.json | head -50
+LATEST_OUTPUT="$(ls -td output/* | head -1)"
+python3 -m json.tool "$LATEST_OUTPUT/columns.json" | head -50
 
-# 5. Teardown
-cd ../terraform
+# 6. Teardown
+cd terraform
 terraform destroy
 ```
 
@@ -82,6 +90,7 @@ terraform destroy
 ```
 bq-extraction-demo/
 ├── README.md
+├── pyproject.toml          # uv-managed Python project metadata
 ├── terraform/
 │   ├── main.tf              # provider, datasets, tables, IAM
 │   ├── variables.tf         # project_id, region
@@ -90,7 +99,11 @@ bq-extraction-demo/
 ├── scripts/
 │   ├── seed_data.sh         # INSERT sample rows
 │   ├── seed_queries.sh      # runs realistic queries to populate JOBS
-│   └── extract.sh           # the extraction script (what Javier runs)
+│   └── extract.py           # Python extractor entrypoint
+├── src/
+│   └── bq_extraction_demo/  # extractor package
+├── tests/                   # unit + smoke coverage
+├── uv.lock                  # pinned dependency lockfile
 └── sample_output/           # reference output from a successful run
     └── .gitkeep
 ```
