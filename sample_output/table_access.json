@@ -1,0 +1,58 @@
+[
+  {
+    "dataset_id": "region-us", 
+    "distinct_users": "1", 
+    "first_accessed": "2026-03-16 21:23:43", 
+    "last_accessed": "2026-03-16 21:24:04", 
+    "query_count": "3", 
+    "table_id": "INFORMATION_SCHEMA.JOBS"
+  }, 
+  {
+    "dataset_id": "raw", 
+    "distinct_users": "1", 
+    "first_accessed": "2026-03-16 21:23:02", 
+    "last_accessed": "2026-03-16 21:23:55", 
+    "query_count": "2", 
+    "table_id": "INFORMATION_SCHEMA.COLUMNS"
+  }, 
+  {
+    "dataset_id": "staging", 
+    "distinct_users": "1", 
+    "first_accessed": "2026-03-16 21:23:55", 
+    "last_accessed": "2026-03-16 21:23:55", 
+    "query_count": "1", 
+    "table_id": "INFORMATION_SCHEMA.COLUMNS"
+  }, 
+  {
+    "dataset_id": "analytics", 
+    "distinct_users": "1", 
+    "first_accessed": "2026-03-16 21:23:55", 
+    "last_accessed": "2026-03-16 21:23:55", 
+    "query_count": "1", 
+    "table_id": "INFORMATION_SCHEMA.COLUMNS"
+  }, 
+  {
+    "dataset_id": "staging", 
+    "distinct_users": "1", 
+    "first_accessed": "2026-03-16 21:23:59", 
+    "last_accessed": "2026-03-16 21:23:59", 
+    "query_count": "1", 
+    "table_id": "INFORMATION_SCHEMA.TABLES"
+  }, 
+  {
+    "dataset_id": "raw", 
+    "distinct_users": "1", 
+    "first_accessed": "2026-03-16 21:23:59", 
+    "last_accessed": "2026-03-16 21:23:59", 
+    "query_count": "1", 
+    "table_id": "INFORMATION_SCHEMA.TABLES"
+  }, 
+  {
+    "dataset_id": "analytics", 
+    "distinct_users": "1", 
+    "first_accessed": "2026-03-16 21:23:59", 
+    "last_accessed": "2026-03-16 21:23:59", 
+    "query_count": "1", 
+    "table_id": "INFORMATION_SCHEMA.TABLES"
+  }
+]

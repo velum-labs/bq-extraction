@@ -1,0 +1,111 @@
+[
+  {
+    "cache_hit": "false", 
+    "creation_time": "2026-03-16 21:23:59", 
+    "duration_seconds": "0", 
+    "job_id": "bqjob_r2a65cbbc9349a870_0000019cf888c75e_1", 
+    "query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
+    "referenced_tables": [
+      {
+        "dataset_id": "staging", 
+        "project_id": "alma-bq-demo-2026", 
+        "table_id": "INFORMATION_SCHEMA.TABLES"
+      }, 
+      {
+        "dataset_id": "raw", 
+        "project_id": "alma-bq-demo-2026", 
+        "table_id": "INFORMATION_SCHEMA.TABLES"
+      }, 
+      {
+        "dataset_id": "analytics", 
+        "project_id": "alma-bq-demo-2026", 
+        "table_id": "INFORMATION_SCHEMA.TABLES"
+      }
+    ], 
+    "statement_type": "SELECT", 
+    "total_bytes_billed": "31457280", 
+    "total_bytes_processed": "31457280", 
+    "total_slot_ms": "116", 
+    "user_email": "alen@velum-labs.com"
+  }, 
+  {
+    "cache_hit": "false", 
+    "creation_time": "2026-03-16 21:23:55", 
+    "duration_seconds": "0", 
+    "job_id": "bqjob_r7f30ed3111517e1a_0000019cf888b841_1", 
+    "query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
+    "referenced_tables": [
+      {
+        "dataset_id": "staging", 
+        "project_id": "alma-bq-demo-2026", 
+        "table_id": "INFORMATION_SCHEMA.COLUMNS"
+      }, 
+      {
+        "dataset_id": "analytics", 
+        "project_id": "alma-bq-demo-2026", 
+        "table_id": "INFORMATION_SCHEMA.COLUMNS"
+      }, 
+      {
+        "dataset_id": "raw", 
+        "project_id": "alma-bq-demo-2026", 
+        "table_id": "INFORMATION_SCHEMA.COLUMNS"
+      }
+    ], 
+    "statement_type": "SELECT", 
+    "total_bytes_billed": "31457280", 
+    "total_bytes_processed": "31457280", 
+    "total_slot_ms": "153", 
+    "user_email": "alen@velum-labs.com"
+  }, 
+  {
+    "cache_hit": "false", 
+    "creation_time": "2026-03-16 21:23:43", 
+    "duration_seconds": "0", 
+    "job_id": "bqjob_r18bea169af8aa837_0000019cf88887eb_1", 
+    "query": "SELECT job_id, query FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS LIMIT 3", 
+    "referenced_tables": [
+      {
+        "dataset_id": "region-us", 
+        "project_id": "alma-bq-demo-2026", 
+        "table_id": "INFORMATION_SCHEMA.JOBS"
+      }
+    ], 
+    "statement_type": "SELECT", 
+    "total_bytes_billed": "0", 
+    "total_bytes_processed": "0", 
+    "total_slot_ms": "537", 
+    "user_email": "alen@velum-labs.com"
+  }, 
+  {
+    "cache_hit": "false", 
+    "creation_time": "2026-03-16 21:23:02", 
+    "duration_seconds": "0", 
+    "job_id": "bqjob_r6312508322f33c4b_0000019cf887e76e_1", 
+    "query": "SELECT table_schema, table_name FROM alma-bq-demo-2026.raw.INFORMATION_SCHEMA.COLUMNS LIMIT 3", 
+    "referenced_tables": [
+      {
+        "dataset_id": "raw", 
+        "project_id": "alma-bq-demo-2026", 
+        "table_id": "INFORMATION_SCHEMA.COLUMNS"
+      }
+    ], 
+    "statement_type": "SELECT", 
+    "total_bytes_billed": "10485760", 
+    "total_bytes_processed": "10485760", 
+    "total_slot_ms": "50", 
+    "user_email": "alen@velum-labs.com"
+  }, 
+  {
+    "cache_hit": "false", 
+    "creation_time": "2026-03-16 21:19:36", 
+    "duration_seconds": "0", 
+    "job_id": "bqjob_r3c26e7a13ed436fe_0000019cf884c4a9_1", 
+    "query": "SELECT 1 AS test", 
+    "referenced_tables": [], 
+    "statement_type": "SELECT", 
+    "total_bytes_billed": "0", 
+    "total_bytes_processed": "0", 
+    "total_slot_ms": "10", 
+    "user_email": "alen@velum-labs.com"
+  }
+]

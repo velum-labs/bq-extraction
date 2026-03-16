@@ -26,7 +26,8 @@ echo "   ✓ $DATASET_COUNT datasets → datasets.json"
 
 # ── 2. All Columns + Types ─────────────────────────────
 echo "② Extracting column schemas..."
-bq query --use_legacy_sql=false --format=prettyjson --max_rows=200000 --project_id="$PROJECT_ID" "
+# Try region-level first; fall back to per-dataset union if permissions insufficient
+if bq query --use_legacy_sql=false --format=prettyjson --max_rows=200000 --project_id="$PROJECT_ID" "
   SELECT
     table_schema AS dataset,
     table_name,
@@ -38,13 +39,26 @@ bq query --use_legacy_sql=false --format=prettyjson --max_rows=200000 --project_
     clustering_ordinal_position
   FROM \`$PROJECT_ID\`.\`region-$REGION\`.INFORMATION_SCHEMA.COLUMNS
   ORDER BY table_schema, table_name, ordinal_position
-" > "$OUTPUT_DIR/columns.json"
+" > "$OUTPUT_DIR/columns.json" 2>/dev/null; then
+  true
+else
+  echo "   (region-level query denied, falling back to per-dataset)"
+  # Build UNION ALL across all datasets
+  DATASETS=$(bq ls --project_id "$PROJECT_ID" --format=json 2>/dev/null | python3 -c "import json,sys; [print(d['datasetReference']['datasetId']) for d in json.load(sys.stdin)]")
+  UNION_SQL=""
+  for DS in $DATASETS; do
+    [ -n "$UNION_SQL" ] && UNION_SQL="$UNION_SQL UNION ALL "
+    UNION_SQL="${UNION_SQL}SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM \`$PROJECT_ID\`.\`$DS\`.INFORMATION_SCHEMA.COLUMNS"
+  done
+  bq query --use_legacy_sql=false --format=prettyjson --max_rows=200000 --project_id="$PROJECT_ID" \
+    "$UNION_SQL ORDER BY dataset, table_name, ordinal_position" > "$OUTPUT_DIR/columns.json"
+fi
 COL_COUNT=$(python3 -c "import json; print(len(json.load(open('$OUTPUT_DIR/columns.json'))))" 2>/dev/null || echo "?")
 echo "   ✓ $COL_COUNT columns → columns.json"
 
 # ── 3. Full DDLs ───────────────────────────────────────
 echo "③ Extracting DDLs (CREATE TABLE statements)..."
-bq query --use_legacy_sql=false --format=prettyjson --max_rows=10000 --project_id="$PROJECT_ID" "
+if bq query --use_legacy_sql=false --format=prettyjson --max_rows=10000 --project_id="$PROJECT_ID" "
   SELECT
     table_schema AS dataset,
     table_name,
@@ -52,7 +66,19 @@ bq query --use_legacy_sql=false --format=prettyjson --max_rows=10000 --project_i
     ddl
   FROM \`$PROJECT_ID\`.\`region-$REGION\`.INFORMATION_SCHEMA.TABLES
   ORDER BY table_schema, table_name
-" > "$OUTPUT_DIR/ddls.json"
+" > "$OUTPUT_DIR/ddls.json" 2>/dev/null; then
+  true
+else
+  echo "   (region-level query denied, falling back to per-dataset)"
+  DATASETS=${DATASETS:-$(bq ls --project_id "$PROJECT_ID" --format=json 2>/dev/null | python3 -c "import json,sys; [print(d['datasetReference']['datasetId']) for d in json.load(sys.stdin)]")}
+  UNION_SQL=""
+  for DS in $DATASETS; do
+    [ -n "$UNION_SQL" ] && UNION_SQL="$UNION_SQL UNION ALL "
+    UNION_SQL="${UNION_SQL}SELECT table_schema AS dataset, table_name, table_type, ddl FROM \`$PROJECT_ID\`.\`$DS\`.INFORMATION_SCHEMA.TABLES"
+  done
+  bq query --use_legacy_sql=false --format=prettyjson --max_rows=10000 --project_id="$PROJECT_ID" \
+    "$UNION_SQL ORDER BY dataset, table_name" > "$OUTPUT_DIR/ddls.json"
+fi
 TBL_COUNT=$(python3 -c "import json; print(len(json.load(open('$OUTPUT_DIR/ddls.json'))))" 2>/dev/null || echo "?")
 echo "   ✓ $TBL_COUNT tables → ddls.json"
 

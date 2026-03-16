@@ -1,0 +1,56 @@
+[
+  {
+    "dataset": "analytics", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.analytics.cmf_regulatory_report`\n(\n  report_month DATE NOT NULL OPTIONS(description=\"First day of reporting month\"),\n  fund_id STRING NOT NULL,\n  fund_name STRING,\n  cmf_rut STRING OPTIONS(description=\"CMF regulator RUT\"),\n  eom_aum_clp NUMERIC NOT NULL OPTIONS(description=\"End of month AUM\"),\n  eom_investor_count INT64,\n  monthly_deposits_clp NUMERIC,\n  monthly_withdrawals_clp NUMERIC,\n  monthly_return_pct FLOAT64,\n  management_fee_collected_clp NUMERIC,\n  generated_at TIMESTAMP NOT NULL\n)\nOPTIONS(\n  expiration_timestamp=TIMESTAMP \"2026-05-15T21:17:34.228Z\",\n  description=\"CMF regulatory report — monthly filing data\"\n);", 
+    "table_name": "cmf_regulatory_report", 
+    "table_type": "BASE TABLE"
+  }, 
+  {
+    "dataset": "analytics", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.analytics.daily_aum`\n(\n  report_date DATE NOT NULL OPTIONS(description=\"Reporting date\"),\n  fund_id STRING NOT NULL OPTIONS(description=\"Fund identifier\"),\n  fund_name STRING OPTIONS(description=\"Fund display name\"),\n  total_aum_clp NUMERIC NOT NULL OPTIONS(description=\"Total AUM in CLP\"),\n  total_aum_usd NUMERIC OPTIONS(description=\"Total AUM in USD\"),\n  investor_count INT64 OPTIONS(description=\"Number of active investors\"),\n  daily_net_flow_clp NUMERIC OPTIONS(description=\"Net deposits - withdrawals\"),\n  daily_return_pct FLOAT64 OPTIONS(description=\"Daily return %\")\n)\nPARTITION BY report_date\nOPTIONS(\n  partition_expiration_days=60.0,\n  description=\"Daily AUM per fund — the core metric Fintual reports to CMF\"\n);", 
+    "table_name": "daily_aum", 
+    "table_type": "BASE TABLE"
+  }, 
+  {
+    "dataset": "analytics", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.analytics.user_portfolio`\n(\n  user_id STRING NOT NULL,\n  fund_id STRING NOT NULL,\n  shares_held FLOAT64 NOT NULL,\n  current_value_clp NUMERIC,\n  total_deposited_clp NUMERIC,\n  total_withdrawn_clp NUMERIC,\n  unrealized_gain_clp NUMERIC,\n  first_investment_date DATE,\n  last_transaction_date DATE,\n  snapshot_date DATE NOT NULL\n)\nOPTIONS(\n  expiration_timestamp=TIMESTAMP \"2026-05-15T21:17:34.213Z\",\n  description=\"Current portfolio snapshot per user\"\n);", 
+    "table_name": "user_portfolio", 
+    "table_type": "BASE TABLE"
+  }, 
+  {
+    "dataset": "raw", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.raw.funds`\n(\n  fund_id STRING NOT NULL OPTIONS(description=\"Unique fund identifier\"),\n  fund_name STRING NOT NULL OPTIONS(description=\"Public fund name\"),\n  fund_type STRING OPTIONS(description=\"e.g. mutual_fund, etf, money_market\"),\n  currency STRING OPTIONS(description=\"ISO 4217 currency code\"),\n  inception_date DATE OPTIONS(description=\"Fund launch date\"),\n  is_active BOOL OPTIONS(description=\"Whether fund is currently active\"),\n  cmf_rut STRING OPTIONS(description=\"Chilean CMF regulator identifier\"),\n  management_fee_bps INT64 OPTIONS(description=\"Annual management fee in basis points\"),\n  loaded_at TIMESTAMP NOT NULL OPTIONS(description=\"Ingestion timestamp\")\n)\nOPTIONS(\n  expiration_timestamp=TIMESTAMP \"2026-05-15T21:17:34.481Z\",\n  description=\"Fund master data from admin system\"\n);", 
+    "table_name": "funds", 
+    "table_type": "BASE TABLE"
+  }, 
+  {
+    "dataset": "raw", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.raw.nav_history`\n(\n  fund_id STRING NOT NULL OPTIONS(description=\"Fund identifier\"),\n  nav_date DATE NOT NULL OPTIONS(description=\"Valuation date\"),\n  nav_per_share FLOAT64 NOT NULL OPTIONS(description=\"NAV per share\"),\n  total_aum NUMERIC OPTIONS(description=\"Total assets under management (CLP)\"),\n  shares_outstanding FLOAT64 OPTIONS(description=\"Total shares outstanding\"),\n  daily_return_pct FLOAT64 OPTIONS(description=\"Daily return percentage\"),\n  loaded_at TIMESTAMP NOT NULL OPTIONS(description=\"Ingestion timestamp\")\n)\nPARTITION BY nav_date\nCLUSTER BY fund_id\nOPTIONS(\n  partition_expiration_days=60.0,\n  description=\"Daily NAV (net asset value) per fund\"\n);", 
+    "table_name": "nav_history", 
+    "table_type": "BASE TABLE"
+  }, 
+  {
+    "dataset": "raw", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.raw.transactions`\n(\n  transaction_id STRING NOT NULL OPTIONS(description=\"Unique transaction ID\"),\n  user_id STRING NOT NULL OPTIONS(description=\"Investor user ID\"),\n  fund_id STRING NOT NULL OPTIONS(description=\"Target fund\"),\n  transaction_type STRING NOT NULL OPTIONS(description=\"deposit, withdrawal, switch_in, switch_out\"),\n  amount_clp NUMERIC NOT NULL OPTIONS(description=\"Transaction amount in CLP\"),\n  amount_usd NUMERIC OPTIONS(description=\"Transaction amount in USD (if applicable)\"),\n  shares FLOAT64 OPTIONS(description=\"Number of fund shares\"),\n  nav_at_transaction FLOAT64 OPTIONS(description=\"NAV per share at time of transaction\"),\n  transaction_date DATE NOT NULL OPTIONS(description=\"Settlement date\"),\n  status STRING OPTIONS(description=\"pending, settled, cancelled\"),\n  source_system STRING OPTIONS(description=\"Originating system\"),\n  loaded_at TIMESTAMP NOT NULL OPTIONS(description=\"Ingestion timestamp\")\n)\nPARTITION BY transaction_date\nCLUSTER BY fund_id, transaction_type\nOPTIONS(\n  partition_expiration_days=60.0,\n  description=\"Investment transactions (deposits, withdrawals, switches)\"\n);", 
+    "table_name": "transactions", 
+    "table_type": "BASE TABLE"
+  }, 
+  {
+    "dataset": "raw", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.raw.users`\n(\n  user_id STRING NOT NULL OPTIONS(description=\"Unique user identifier\"),\n  email_hash STRING OPTIONS(description=\"Hashed email (PII masked)\"),\n  registration_date DATE OPTIONS(description=\"Account creation date\"),\n  country_code STRING OPTIONS(description=\"ISO 3166-1 alpha-2\"),\n  risk_profile STRING OPTIONS(description=\"conservative, moderate, aggressive\"),\n  is_qualified_investor BOOL OPTIONS(description=\"Chilean qualified investor flag\"),\n  kyc_status STRING OPTIONS(description=\"pending, approved, rejected\"),\n  loaded_at TIMESTAMP NOT NULL OPTIONS(description=\"Ingestion timestamp\")\n)\nOPTIONS(\n  expiration_timestamp=TIMESTAMP \"2026-05-15T21:17:34.249Z\",\n  description=\"Investor profiles\"\n);", 
+    "table_name": "users", 
+    "table_type": "BASE TABLE"
+  }, 
+  {
+    "dataset": "staging", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.staging.stg_transactions`\n(\n  transaction_id STRING NOT NULL,\n  user_id STRING NOT NULL,\n  fund_id STRING NOT NULL,\n  transaction_type STRING NOT NULL,\n  amount_clp NUMERIC NOT NULL,\n  shares FLOAT64,\n  transaction_date DATE NOT NULL,\n  loaded_at TIMESTAMP NOT NULL\n)\nPARTITION BY transaction_date\nOPTIONS(\n  partition_expiration_days=60.0,\n  description=\"Cleaned transactions — deduped, status filtered, amounts validated\"\n);", 
+    "table_name": "stg_transactions", 
+    "table_type": "BASE TABLE"
+  }, 
+  {
+    "dataset": "staging", 
+    "ddl": "CREATE TABLE `alma-bq-demo-2026.staging.stg_users`\n(\n  user_id STRING NOT NULL,\n  registration_date DATE,\n  country_code STRING,\n  risk_profile STRING,\n  is_qualified_investor BOOL\n)\nOPTIONS(\n  expiration_timestamp=TIMESTAMP \"2026-05-15T21:17:34.097Z\",\n  description=\"Cleaned user profiles — KYC approved only\"\n);", 
+    "table_name": "stg_users", 
+    "table_type": "BASE TABLE"
+  }
+]
