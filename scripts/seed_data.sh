@@ -1,11 +1,11 @@
 #!/bin/bash
-# Seed demo data into the BQ tables created by Terraform.
+# Seed sample data into the BQ tables created by Terraform.
 # Usage: ./seed_data.sh <project-id>
 set -euo pipefail
 
 PROJECT_ID="${1:?Usage: $0 <project-id>}"
 
-echo "Seeding demo data into $PROJECT_ID ..."
+echo "Seeding sample data into $PROJECT_ID ..."
 
 # Truncate all tables first (idempotent — safe to re-run)
 echo "→ Truncating existing data..."

@@ -25,8 +25,8 @@ resource "google_bigquery_dataset" "raw" {
   location    = var.region
 
   labels = {
-    layer = "raw"
-    demo  = "alma-extraction"
+    layer    = "raw"
+    workload = "alma-extraction"
   }
 }
 
@@ -36,8 +36,8 @@ resource "google_bigquery_dataset" "staging" {
   location    = var.region
 
   labels = {
-    layer = "staging"
-    demo  = "alma-extraction"
+    layer    = "staging"
+    workload = "alma-extraction"
   }
 }
 
@@ -47,8 +47,8 @@ resource "google_bigquery_dataset" "analytics" {
   location    = var.region
 
   labels = {
-    layer = "analytics"
-    demo  = "alma-extraction"
+    layer    = "analytics"
+    workload = "alma-extraction"
   }
 }
 
@@ -263,7 +263,7 @@ resource "google_bigquery_table" "cmf_report" {
 resource "google_service_account" "extractor" {
   count        = var.create_service_account ? 1 : 0
   account_id   = "alma-extractor"
-  display_name = "Alma Schema Extractor (demo)"
+  display_name = "Alma Schema Extractor"
   description  = "Minimum permissions needed to extract schemas + query logs"
 }
 

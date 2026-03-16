@@ -1,5 +1,5 @@
 variable "project_id" {
-  description = "GCP project ID to provision demo resources in"
+  description = "GCP project ID to provision extraction resources in"
   type        = string
 }
 

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any, Iterable
 
-from bq_extraction_demo.service import BigQueryService
+from bq_extraction.service import BigQueryService
 
 
 def write_json(path: Path, payload: Any) -> None:

@@ -10,7 +10,7 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "bq-extraction-demo"
+name = "bq-extraction"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

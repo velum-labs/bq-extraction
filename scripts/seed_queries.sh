@@ -8,7 +8,7 @@ PROJECT_ID="${1:?Usage: $0 <project-id> [region]}"
 REGION="${2:-US}"
 
 echo "Seeding query traffic into $PROJECT_ID (region: $REGION) ..."
-echo "(These populate INFORMATION_SCHEMA.JOBS for the extraction demo)"
+echo "(These populate INFORMATION_SCHEMA.JOBS for the extraction workflow)"
 echo ""
 
 # Helper: run a query silently, just to create a JOBS entry
@@ -151,7 +151,7 @@ echo ""
 echo "✅ Query seeding complete! $(date)"
 echo "   15 queries executed — visible in INFORMATION_SCHEMA.JOBS"
 echo ""
-echo "   Highlights for the demo:"
+echo "   Highlights from the seeded workload:"
 echo "   - 2 competing 'revenue' definitions (management fee calc vs CMF report)"
 echo "   - Dashboard queries vs analyst ad-hoc vs dbt transforms"
 echo "   - Cross-dataset joins that Alma would flag"

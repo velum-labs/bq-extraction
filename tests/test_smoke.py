@@ -17,7 +17,7 @@ def test_cli_dry_run_smoke(tmp_path: Path) -> None:
         "python",
         "scripts/extract.py",
         "--project",
-        "demo-project",
+        "example-project",
         "--region",
         "us",
         "--output-dir",
@@ -41,7 +41,7 @@ def test_cli_reports_extraction_failures_to_stderr(tmp_path: Path) -> None:
         "python",
         "scripts/extract.py",
         "--project",
-        "demo-project",
+        "example-project",
         "--output-dir",
         str(output_path),
     ]

@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
-from bq_extraction_demo.config import ExtractionConfig
-from bq_extraction_demo.contract import (
+from bq_extraction.config import ExtractionConfig
+from bq_extraction.contract import (
     CAPABILITY_SPECS,
     OBJECT_FAMILIES,
     CapabilitySpec,
@@ -17,8 +17,8 @@ from bq_extraction_demo.contract import (
     family_output_name,
     probe_sql,
 )
-from bq_extraction_demo.service import BigQueryService, DatasetDiscovery, QueryResult
-from bq_extraction_demo.writer import derive_field_names, write_rows
+from bq_extraction.service import BigQueryService, DatasetDiscovery, QueryResult
+from bq_extraction.writer import derive_field_names, write_rows
 
 
 class DiscoveryService(Protocol):
@@ -90,7 +90,7 @@ STEP_COUNT = 4
 
 
 def build_logger(*, quiet: bool) -> logging.Logger:
-    logger = logging.getLogger("bq_extraction_demo")
+    logger = logging.getLogger("bq_extraction")
     logger.handlers.clear()
     logger.setLevel(logging.INFO)
     logger.propagate = False

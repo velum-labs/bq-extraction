@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import sys
 
-from bq_extraction_demo.config import parse_args
-from bq_extraction_demo.extractor import ExtractionRunner, format_error
+from bq_extraction.config import parse_args
+from bq_extraction.extractor import ExtractionRunner, format_error
 
 
 def main(argv: list[str] | None = None) -> int:

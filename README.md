@@ -1,6 +1,6 @@
-# BigQuery Discovery-Based Extraction Demo
+# BigQuery Discovery-Based Extraction
 
-Reproducible demo: provisions a BigQuery project with realistic fintech schemas, seeds sample data + query traffic, then runs a discovery-first extractor that auto-discovers what metadata is available through BigQuery APIs, SDKs, and scoped `INFORMATION_SCHEMA` capabilities.
+Reproducible setup: provisions a BigQuery project with realistic fintech schemas, seeds sample data + query traffic, then runs a discovery-first extractor that auto-discovers what metadata is available through BigQuery APIs, SDKs, and scoped `INFORMATION_SCHEMA` capabilities.
 
 ## What This Proves
 
@@ -44,7 +44,7 @@ cd ../scripts
 ./seed_data.sh <project-id>
 ./seed_queries.sh <project-id>
 
-# 4. Run extraction (the thing we're demoing)
+# 4. Run extraction
 cd ..
 uv run python scripts/extract.py --project <project-id>
 
@@ -94,7 +94,7 @@ Derived outputs
 
 ## Common Flags
 
-- `--locations us,eu,...` limits discovery and extraction to specific BigQuery locations. `--region` is kept as a single-location alias for compatibility with older demo flows.
+- `--locations us,eu,...` limits discovery and extraction to specific BigQuery locations. `--region` is kept as a single-location alias for compatibility with older single-location flows.
 - `--families datasets,tables,routines,models,jobs` narrows which object families are emitted.
 - `--sources tables.ddls,jobs.query_logs,...` narrows which non-API metadata capabilities run.
 - `--dry-run` performs discovery and capability probing without writing output files.
@@ -102,7 +102,7 @@ Derived outputs
 ## Directory Structure
 
 ```
-bq-extraction-demo/
+bq-extraction/
 ├── README.md
 ├── pyproject.toml          # uv-managed Python project metadata
 ├── terraform/
@@ -115,7 +115,7 @@ bq-extraction-demo/
 │   ├── seed_queries.sh      # runs realistic queries to populate JOBS
 │   └── extract.py           # Python extractor entrypoint
 ├── src/
-│   └── bq_extraction_demo/  # extractor package + capability registry
+│   └── bq_extraction/       # extractor package + capability registry
 ├── tests/                   # unit + smoke coverage
 ├── uv.lock                  # pinned dependency lockfile
 └── sample_output/           # reference output from a successful run
@@ -128,4 +128,4 @@ bq-extraction-demo/
 cd terraform && terraform destroy
 ```
 
-Total cost: ~$0. BQ storage for a few KB of demo data + a handful of queries on free tier.
+Total cost: ~$0. BQ storage for a few KB of sample data + a handful of queries on free tier.

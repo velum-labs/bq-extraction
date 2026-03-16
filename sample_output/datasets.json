@@ -2,12 +2,12 @@
   {
     "datasetReference": {
       "datasetId": "analytics",
-      "projectId": "alma-bq-demo-2026"
+      "projectId": "alma-bq-extraction-2026"
     },
-    "id": "alma-bq-demo-2026:analytics",
+    "id": "alma-bq-extraction-2026:analytics",
     "kind": "bigquery#dataset",
     "labels": {
-      "demo": "alma-extraction",
+      "workload": "alma-extraction",
       "layer": "analytics"
     },
     "location": "US"
@@ -15,12 +15,12 @@
   {
     "datasetReference": {
       "datasetId": "raw",
-      "projectId": "alma-bq-demo-2026"
+      "projectId": "alma-bq-extraction-2026"
     },
-    "id": "alma-bq-demo-2026:raw",
+    "id": "alma-bq-extraction-2026:raw",
     "kind": "bigquery#dataset",
     "labels": {
-      "demo": "alma-extraction",
+      "workload": "alma-extraction",
       "layer": "raw"
     },
     "location": "US"
@@ -28,12 +28,12 @@
   {
     "datasetReference": {
       "datasetId": "staging",
-      "projectId": "alma-bq-demo-2026"
+      "projectId": "alma-bq-extraction-2026"
     },
-    "id": "alma-bq-demo-2026:staging",
+    "id": "alma-bq-extraction-2026:staging",
     "kind": "bigquery#dataset",
     "labels": {
-      "demo": "alma-extraction",
+      "workload": "alma-extraction",
       "layer": "staging"
     },
     "location": "US"

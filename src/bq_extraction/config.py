@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
-from bq_extraction_demo.contract import (
+from bq_extraction.contract import (
     CAPABILITY_KEYS,
     OBJECT_FAMILY_KEYS,
     SUPPORTED_FORMATS,

@@ -3,29 +3,29 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from bq_extraction_demo.config import ExtractionConfig
-from bq_extraction_demo.service import DatasetDiscovery, QueryResult
-from bq_extraction_demo.extractor import ExtractionRunner
+from bq_extraction.config import ExtractionConfig
+from bq_extraction.service import DatasetDiscovery, QueryResult
+from bq_extraction.extractor import ExtractionRunner
 
 
 class FakeService:
     def __init__(self) -> None:
         self.datasets = [
             DatasetDiscovery(
-                project_id="demo-project",
+                project_id="example-project",
                 dataset_id="analytics",
                 location="US",
                 payload={
-                    "datasetReference": {"projectId": "demo-project", "datasetId": "analytics"},
+                    "datasetReference": {"projectId": "example-project", "datasetId": "analytics"},
                     "location": "US",
                 },
             ),
             DatasetDiscovery(
-                project_id="demo-project",
+                project_id="example-project",
                 dataset_id="staging",
                 location="EU",
                 payload={
-                    "datasetReference": {"projectId": "demo-project", "datasetId": "staging"},
+                    "datasetReference": {"projectId": "example-project", "datasetId": "staging"},
                     "location": "EU",
                 },
             ),
@@ -109,11 +109,11 @@ class FakeService:
                 ),
                 rows=[
                     {
-                        "table_catalog": "demo-project",
+                        "table_catalog": "example-project",
                         "dataset": "analytics",
                         "table_name": "daily_aum",
                         "table_type": "BASE TABLE",
-                        "ddl": "CREATE TABLE `demo-project.analytics.daily_aum` (id INT64)",
+                        "ddl": "CREATE TABLE `example-project.analytics.daily_aum` (id INT64)",
                     }
                 ],
             )
@@ -148,7 +148,7 @@ class FakeService:
                 rows=[
                     {
                         "job_id": "job-1",
-                        "labels": [{"key": "airflow_dag_id", "value": "demo"}],
+                        "labels": [{"key": "airflow_dag_id", "value": "daily-sync"}],
                         "cache_hit": "false",
                     }
                 ],
@@ -191,7 +191,7 @@ def test_standard_run_logs_header_steps_and_summary(tmp_path: Path, capsys) -> N
 
     captured = capsys.readouterr()
     assert "BigQuery Discovery Extractor" in captured.out
-    assert "Project: demo-project" in captured.out
+    assert "Project: example-project" in captured.out
     assert "Step 1/4: Discover datasets" in captured.out
     assert "Step 2/4: Extract API-backed object families" in captured.out
     assert "Step 3/4: Probe metadata capabilities" in captured.out
@@ -255,7 +255,7 @@ def test_tables_capability_falls_back_to_dataset_scope(tmp_path: Path) -> None:
     payload = json.loads(output_path.read_text(encoding="utf-8"))
 
     assert any("region-us" in probe[0] for probe in service.probes)
-    assert any("`demo-project`.`analytics`.INFORMATION_SCHEMA.TABLES" in query[0] for query in service.queries)
+    assert any("`example-project`.`analytics`.INFORMATION_SCHEMA.TABLES" in query[0] for query in service.queries)
     assert any(row["location"] == "US" for row in payload)
     assert any(row["table_name"] == "daily_aum" for row in payload)
 
@@ -309,7 +309,7 @@ def test_csv_output_serializes_nested_query_rows(tmp_path: Path) -> None:
 
     contents = (config.output_dir / "jobs.query_logs.csv").read_text(encoding="utf-8")
     assert "location,job_id,labels,cache_hit" in contents
-    assert '"[{""key"":""airflow_dag_id"",""value"":""demo""}]"' in contents
+    assert '"[{""key"":""airflow_dag_id"",""value"":""daily-sync""}]"' in contents
     assert "job-1" in contents
 
 
@@ -343,11 +343,11 @@ def test_hyphenated_locations_are_canonicalized_for_grouping(tmp_path: Path) -> 
     service = FakeService()
     service.datasets = [
         DatasetDiscovery(
-            project_id="demo-project",
+            project_id="example-project",
             dataset_id="regional",
             location="US-CENTRAL1",
             payload={
-                "datasetReference": {"projectId": "demo-project", "datasetId": "regional"},
+                "datasetReference": {"projectId": "example-project", "datasetId": "regional"},
                 "location": "US-CENTRAL1",
             },
         )
@@ -391,7 +391,7 @@ def make_config(
     location_filters: tuple[str, ...] = (),
 ) -> ExtractionConfig:
     return ExtractionConfig(
-        project_id="demo-project",
+        project_id="example-project",
         location_filters=location_filters,
         output_dir=tmp_path / "output",
         days=30,

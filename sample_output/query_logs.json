@@ -5,22 +5,22 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r5cd3e04ab562554c_0000019cf88ef0b9_1", 
     "labels": [], 
-    "query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
+    "query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "staging", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }, 
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }, 
       {
         "dataset_id": "analytics", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }
     ], 
@@ -36,22 +36,22 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r6a3b6db4c94a92b5_0000019cf88ee302_1", 
     "labels": [], 
-    "query": "SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS ORDER BY dataset, table_name, column_name", 
+    "query": "SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-extraction-2026`.`analytics`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-extraction-2026`.`raw`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-extraction-2026`.`staging`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS ORDER BY dataset, table_name, column_name", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
       }, 
       {
         "dataset_id": "staging", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
       }, 
       {
         "dataset_id": "analytics", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
       }
     ], 
@@ -67,22 +67,22 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r29e783254f006833_0000019cf88edb45_1", 
     "labels": [], 
-    "query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
+    "query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "analytics", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }, 
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }, 
       {
         "dataset_id": "staging", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }
     ], 
@@ -98,12 +98,12 @@
     "duration_seconds": "1", 
     "job_id": "bqjob_re78d9ce7576c2f4_0000019cf88e2174_1", 
     "labels": [], 
-    "query": "\n  SELECT\n    user_email,\n    COUNT(*) AS query_count,\n    COUNTIF(statement_type = 'SELECT') AS select_count,\n    COUNTIF(statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')) AS dml_count,\n    ROUND(SUM(total_bytes_processed) / 1e9, 2) AS total_gb_processed,\n    ROUND(SUM(total_slot_ms) / 1000 / 3600, 2) AS total_slot_hours\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n  GROUP BY user_email\n  ORDER BY query_count DESC\n", 
+    "query": "\n  SELECT\n    user_email,\n    COUNT(*) AS query_count,\n    COUNTIF(statement_type = 'SELECT') AS select_count,\n    COUNTIF(statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')) AS dml_count,\n    ROUND(SUM(total_bytes_processed) / 1e9, 2) AS total_gb_processed,\n    ROUND(SUM(total_slot_ms) / 1000 / 3600, 2) AS total_slot_hours\n  FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n  GROUP BY user_email\n  ORDER BY query_count DESC\n", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -119,12 +119,12 @@
     "duration_seconds": "1", 
     "job_id": "bqjob_r12d717d781c5b487_0000019cf88e162f_1", 
     "labels": [], 
-    "query": "\n  SELECT\n    ref.dataset_id,\n    ref.table_id,\n    COUNT(*) AS query_count,\n    COUNT(DISTINCT user_email) AS distinct_users,\n    MIN(creation_time) AS first_accessed,\n    MAX(creation_time) AS last_accessed\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS,\n    UNNEST(referenced_tables) AS ref\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  GROUP BY ref.dataset_id, ref.table_id\n  ORDER BY query_count DESC\n", 
+    "query": "\n  SELECT\n    ref.dataset_id,\n    ref.table_id,\n    COUNT(*) AS query_count,\n    COUNT(DISTINCT user_email) AS distinct_users,\n    MIN(creation_time) AS first_accessed,\n    MAX(creation_time) AS last_accessed\n  FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS,\n    UNNEST(referenced_tables) AS ref\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  GROUP BY ref.dataset_id, ref.table_id\n  ORDER BY query_count DESC\n", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -140,12 +140,12 @@
     "duration_seconds": "1", 
     "job_id": "bqjob_r71daf603572f3fd1_0000019cf88e0b89_1", 
     "labels": [], 
-    "query": "\n  SELECT\n    query_info.query_hashes.normalized_literals AS query_hash,\n    COUNT(*) AS execution_count,\n    ARRAY_AGG(query LIMIT 1)[OFFSET(0)] AS sample_query,\n    ARRAY_AGG(DISTINCT user_email) AS users,\n    ROUND(AVG(total_bytes_processed), 0) AS avg_bytes,\n    ROUND(AVG(total_slot_ms), 0) AS avg_slot_ms\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n    AND query_info.query_hashes.normalized_literals IS NOT NULL\n  GROUP BY query_hash\n  ORDER BY execution_count DESC\n  LIMIT 100\n", 
+    "query": "\n  SELECT\n    query_info.query_hashes.normalized_literals AS query_hash,\n    COUNT(*) AS execution_count,\n    ARRAY_AGG(query LIMIT 1)[OFFSET(0)] AS sample_query,\n    ARRAY_AGG(DISTINCT user_email) AS users,\n    ROUND(AVG(total_bytes_processed), 0) AS avg_bytes,\n    ROUND(AVG(total_slot_ms), 0) AS avg_slot_ms\n  FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n    AND query_info.query_hashes.normalized_literals IS NOT NULL\n  GROUP BY query_hash\n  ORDER BY execution_count DESC\n  LIMIT 100\n", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -161,12 +161,12 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r5026f7547219e76_0000019cf88e0132_1", 
     "labels": [], 
-    "query": "\n  SELECT\n    job_id,\n    user_email,\n    query,\n    statement_type,\n    creation_time,\n    TIMESTAMP_DIFF(end_time, start_time, SECOND) AS duration_seconds,\n    total_bytes_processed,\n    total_bytes_billed,\n    total_slot_ms,\n    cache_hit,\n    referenced_tables\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  ORDER BY creation_time DESC\n", 
+    "query": "\n  SELECT\n    job_id,\n    user_email,\n    query,\n    statement_type,\n    creation_time,\n    TIMESTAMP_DIFF(end_time, start_time, SECOND) AS duration_seconds,\n    total_bytes_processed,\n    total_bytes_billed,\n    total_slot_ms,\n    cache_hit,\n    referenced_tables\n  FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  ORDER BY creation_time DESC\n", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -182,22 +182,22 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r107a9e49262a2543_0000019cf88df9d8_1", 
     "labels": [], 
-    "query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
+    "query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "staging", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }, 
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }, 
       {
         "dataset_id": "analytics", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }
     ], 
@@ -213,22 +213,22 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r4369f01bf8e14360_0000019cf88dec02_1", 
     "labels": [], 
-    "query": "SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS ORDER BY dataset, table_name, column_name", 
+    "query": "SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-extraction-2026`.`analytics`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-extraction-2026`.`raw`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS UNION ALL SELECT table_schema AS dataset, table_name, column_name, field_path, description, data_type FROM `alma-bq-extraction-2026`.`staging`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS ORDER BY dataset, table_name, column_name", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "analytics", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
       }, 
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
       }, 
       {
         "dataset_id": "staging", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
       }
     ], 
@@ -244,22 +244,22 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r458d345bf12b2027_0000019cf88de3bb_1", 
     "labels": [], 
-    "query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
+    "query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "staging", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }, 
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }, 
       {
         "dataset_id": "analytics", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }
     ], 
@@ -275,12 +275,12 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r5b43c8aa9538c19f_0000019cf88d597a_1", 
     "labels": [], 
-    "query": "SELECT table_name, column_name, field_path, description, data_type FROM alma-bq-demo-2026.raw.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS WHERE description IS NOT NULL AND description != '' LIMIT 5", 
+    "query": "SELECT table_name, column_name, field_path, description, data_type FROM alma-bq-extraction-2026.raw.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS WHERE description IS NOT NULL AND description != '' LIMIT 5", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
       }
     ], 
@@ -296,12 +296,12 @@
     "duration_seconds": "1", 
     "job_id": "bqjob_r5800ad1e46bb7837_0000019cf888ed0c_1", 
     "labels": [], 
-    "query": "\n  SELECT\n    user_email,\n    COUNT(*) AS query_count,\n    COUNTIF(statement_type = 'SELECT') AS select_count,\n    COUNTIF(statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')) AS dml_count,\n    ROUND(SUM(total_bytes_processed) / 1e9, 2) AS total_gb_processed,\n    ROUND(SUM(total_slot_ms) / 1000 / 3600, 2) AS total_slot_hours\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n  GROUP BY user_email\n  ORDER BY query_count DESC\n", 
+    "query": "\n  SELECT\n    user_email,\n    COUNT(*) AS query_count,\n    COUNTIF(statement_type = 'SELECT') AS select_count,\n    COUNTIF(statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')) AS dml_count,\n    ROUND(SUM(total_bytes_processed) / 1e9, 2) AS total_gb_processed,\n    ROUND(SUM(total_slot_ms) / 1000 / 3600, 2) AS total_slot_hours\n  FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n  GROUP BY user_email\n  ORDER BY query_count DESC\n", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -317,12 +317,12 @@
     "duration_seconds": "1", 
     "job_id": "bqjob_rb9cd58b4da847a5_0000019cf888e280_1", 
     "labels": [], 
-    "query": "\n  SELECT\n    ref.dataset_id,\n    ref.table_id,\n    COUNT(*) AS query_count,\n    COUNT(DISTINCT user_email) AS distinct_users,\n    MIN(creation_time) AS first_accessed,\n    MAX(creation_time) AS last_accessed\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS,\n    UNNEST(referenced_tables) AS ref\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  GROUP BY ref.dataset_id, ref.table_id\n  ORDER BY query_count DESC\n", 
+    "query": "\n  SELECT\n    ref.dataset_id,\n    ref.table_id,\n    COUNT(*) AS query_count,\n    COUNT(DISTINCT user_email) AS distinct_users,\n    MIN(creation_time) AS first_accessed,\n    MAX(creation_time) AS last_accessed\n  FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS,\n    UNNEST(referenced_tables) AS ref\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  GROUP BY ref.dataset_id, ref.table_id\n  ORDER BY query_count DESC\n", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -338,12 +338,12 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r37bbec72873c363_0000019cf888d841_1", 
     "labels": [], 
-    "query": "\n  SELECT\n    query_info.query_hashes.normalized_literals AS query_hash,\n    COUNT(*) AS execution_count,\n    ARRAY_AGG(query LIMIT 1)[OFFSET(0)] AS sample_query,\n    ARRAY_AGG(DISTINCT user_email) AS users,\n    ROUND(AVG(total_bytes_processed), 0) AS avg_bytes,\n    ROUND(AVG(total_slot_ms), 0) AS avg_slot_ms\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n    AND query_info.query_hashes.normalized_literals IS NOT NULL\n  GROUP BY query_hash\n  ORDER BY execution_count DESC\n  LIMIT 100\n", 
+    "query": "\n  SELECT\n    query_info.query_hashes.normalized_literals AS query_hash,\n    COUNT(*) AS execution_count,\n    ARRAY_AGG(query LIMIT 1)[OFFSET(0)] AS sample_query,\n    ARRAY_AGG(DISTINCT user_email) AS users,\n    ROUND(AVG(total_bytes_processed), 0) AS avg_bytes,\n    ROUND(AVG(total_slot_ms), 0) AS avg_slot_ms\n  FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n    AND query_info.query_hashes.normalized_literals IS NOT NULL\n  GROUP BY query_hash\n  ORDER BY execution_count DESC\n  LIMIT 100\n", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -359,12 +359,12 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_raaa915f149fec71_0000019cf888ce93_1", 
     "labels": [], 
-    "query": "\n  SELECT\n    job_id,\n    user_email,\n    query,\n    statement_type,\n    creation_time,\n    TIMESTAMP_DIFF(end_time, start_time, SECOND) AS duration_seconds,\n    total_bytes_processed,\n    total_bytes_billed,\n    total_slot_ms,\n    cache_hit,\n    referenced_tables\n  FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  ORDER BY creation_time DESC\n", 
+    "query": "\n  SELECT\n    job_id,\n    user_email,\n    query,\n    statement_type,\n    creation_time,\n    TIMESTAMP_DIFF(end_time, start_time, SECOND) AS duration_seconds,\n    total_bytes_processed,\n    total_bytes_billed,\n    total_slot_ms,\n    cache_hit,\n    referenced_tables\n  FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS\n  WHERE\n    creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)\n    AND job_type = 'QUERY'\n    AND state = 'DONE'\n    AND error_result IS NULL\n  ORDER BY creation_time DESC\n", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -380,22 +380,22 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r2a65cbbc9349a870_0000019cf888c75e_1", 
     "labels": [], 
-    "query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
+    "query": "SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`analytics`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`raw`.INFORMATION_SCHEMA.TABLES UNION ALL SELECT table_schema AS dataset, table_name, table_type, ddl FROM `alma-bq-extraction-2026`.`staging`.INFORMATION_SCHEMA.TABLES ORDER BY dataset, table_name", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "staging", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }, 
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }, 
       {
         "dataset_id": "analytics", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.TABLES"
       }
     ], 
@@ -411,22 +411,22 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r7f30ed3111517e1a_0000019cf888b841_1", 
     "labels": [], 
-    "query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-demo-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
+    "query": "SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`analytics`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`raw`.INFORMATION_SCHEMA.COLUMNS UNION ALL SELECT table_schema AS dataset, table_name, column_name, ordinal_position, data_type, is_nullable, is_partitioning_column, clustering_ordinal_position FROM `alma-bq-extraction-2026`.`staging`.INFORMATION_SCHEMA.COLUMNS ORDER BY dataset, table_name, ordinal_position", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "staging", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }, 
       {
         "dataset_id": "analytics", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }, 
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }
     ], 
@@ -442,12 +442,12 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r18bea169af8aa837_0000019cf88887eb_1", 
     "labels": [], 
-    "query": "SELECT job_id, query FROM `alma-bq-demo-2026`.`region-us`.INFORMATION_SCHEMA.JOBS LIMIT 3", 
+    "query": "SELECT job_id, query FROM `alma-bq-extraction-2026`.`region-us`.INFORMATION_SCHEMA.JOBS LIMIT 3", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "region-us", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.JOBS"
       }
     ], 
@@ -463,12 +463,12 @@
     "duration_seconds": "0", 
     "job_id": "bqjob_r6312508322f33c4b_0000019cf887e76e_1", 
     "labels": [], 
-    "query": "SELECT table_schema, table_name FROM alma-bq-demo-2026.raw.INFORMATION_SCHEMA.COLUMNS LIMIT 3", 
+    "query": "SELECT table_schema, table_name FROM alma-bq-extraction-2026.raw.INFORMATION_SCHEMA.COLUMNS LIMIT 3", 
     "query_source": "ad_hoc", 
     "referenced_tables": [
       {
         "dataset_id": "raw", 
-        "project_id": "alma-bq-demo-2026", 
+        "project_id": "alma-bq-extraction-2026", 
         "table_id": "INFORMATION_SCHEMA.COLUMNS"
       }
     ], 
