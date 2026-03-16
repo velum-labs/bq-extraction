@@ -7,7 +7,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
-from bq_extraction_demo.contract import STEP_ORDER, SUPPORTED_FORMATS
+from bq_extraction_demo.contract import (
+    CAPABILITY_KEYS,
+    OBJECT_FAMILY_KEYS,
+    SUPPORTED_FORMATS,
+)
 
 
 DATASET_RE = re.compile(r"^[A-Za-z0-9_]+$")
@@ -16,13 +20,17 @@ DATASET_RE = re.compile(r"^[A-Za-z0-9_]+$")
 @dataclass(frozen=True)
 class ExtractionConfig:
     project_id: str
-    region: str
+    location_filters: tuple[str, ...]
     output_dir: Path
     days: int
     max_rows: int
     output_format: str
     datasets: tuple[str, ...]
-    skip_steps: frozenset[str]
+    include_families: frozenset[str]
+    exclude_families: frozenset[str]
+    include_sources: frozenset[str]
+    exclude_sources: frozenset[str]
+    include_hidden_datasets: bool
     quiet: bool
     dry_run: bool
 
@@ -30,12 +38,23 @@ class ExtractionConfig:
     def output_extension(self) -> str:
         return self.output_format
 
-    @property
-    def query_location(self) -> str:
-        return self.region.upper()
+    def wants_family(self, family_key: str) -> bool:
+        if self.include_families and family_key not in self.include_families:
+            return False
+        return family_key not in self.exclude_families
 
-    def should_skip(self, step_key: str) -> bool:
-        return step_key in self.skip_steps
+    def wants_source(self, source_key: str) -> bool:
+        family_key = source_key.split(".", 1)[0]
+        if not self.wants_family(family_key):
+            return False
+        if self.include_sources and source_key not in self.include_sources:
+            return False
+        return source_key not in self.exclude_sources
+
+    def location_allowed(self, location: str) -> bool:
+        if not self.location_filters:
+            return True
+        return location.lower() in self.location_filters
 
 
 def default_output_dir(now: datetime | None = None) -> Path:
@@ -46,13 +65,16 @@ def default_output_dir(now: datetime | None = None) -> Path:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="extract.py",
-        description="Extract BigQuery schema and query logs for analysis.",
+        description="Discover and extract BigQuery metadata through APIs, SDKs, and scoped metadata views.",
     )
     parser.add_argument("--project", required=True, dest="project_id", help="GCP project to extract from")
     parser.add_argument(
         "--region",
-        default="us",
-        help="INFORMATION_SCHEMA region (default: us)",
+        help="Deprecated alias for a single location filter",
+    )
+    parser.add_argument(
+        "--locations",
+        help="Only include these locations (comma-separated, for example: us,eu,us-central1)",
     )
     parser.add_argument(
         "--output-dir",
@@ -77,14 +99,39 @@ def build_parser() -> argparse.ArgumentParser:
         help="Only include these datasets (comma-separated)",
     )
     parser.add_argument(
-        "--skip",
+        "--families",
         help=(
-            "Skip steps. Available steps: "
-            + ", ".join(STEP_ORDER)
+            "Only include these object families: "
+            + ", ".join(OBJECT_FAMILY_KEYS)
         ),
     )
+    parser.add_argument(
+        "--exclude-families",
+        help="Exclude these object families (comma-separated)",
+    )
+    parser.add_argument(
+        "--sources",
+        help="Only include these metadata sources: " + ", ".join(CAPABILITY_KEYS),
+    )
+    parser.add_argument(
+        "--exclude-sources",
+        help="Exclude these metadata sources (comma-separated)",
+    )
+    parser.add_argument(
+        "--skip",
+        help="Deprecated alias for --exclude-sources",
+    )
+    parser.add_argument(
+        "--include-hidden-datasets",
+        action="store_true",
+        help="Include hidden datasets in API-backed dataset discovery",
+    )
     parser.add_argument("--quiet", action="store_true", help="Output only the output dir path on success")
-    parser.add_argument("--dry-run", action="store_true", help="Print queries without executing")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Perform discovery and capability probing without writing output files",
+    )
     return parser
 
 
@@ -99,33 +146,80 @@ def parse_args(argv: Sequence[str] | None = None, now: datetime | None = None) -
         parser.error("--days must be greater than 0")
     if max_rows <= 0:
         parser.error("--max-rows must be greater than 0")
+    if namespace.region and namespace.locations:
+        parser.error("use either --region or --locations, not both")
 
     datasets = _parse_csv_values(namespace.datasets, label="dataset", parser=parser, validator=DATASET_RE.fullmatch)
-    skip_steps = frozenset(_parse_skip_steps(namespace.skip, parser))
+    family_values = _parse_keywords(
+        namespace.families,
+        valid_values=OBJECT_FAMILY_KEYS,
+        flag_name="--families",
+        parser=parser,
+    )
+    excluded_families = _parse_keywords(
+        namespace.exclude_families,
+        valid_values=OBJECT_FAMILY_KEYS,
+        flag_name="--exclude-families",
+        parser=parser,
+    )
+    include_sources = _parse_keywords(
+        namespace.sources,
+        valid_values=CAPABILITY_KEYS,
+        flag_name="--sources",
+        parser=parser,
+    )
+    excluded_sources = set(
+        _parse_keywords(
+            namespace.exclude_sources,
+            valid_values=CAPABILITY_KEYS,
+            flag_name="--exclude-sources",
+            parser=parser,
+        )
+    )
+    excluded_sources.update(
+        _parse_keywords(
+            namespace.skip,
+            valid_values=CAPABILITY_KEYS,
+            flag_name="--skip",
+            parser=parser,
+        )
+    )
+
+    locations_raw = namespace.locations or namespace.region
+    location_filters = tuple(value.lower() for value in _parse_csv_values(locations_raw, label="location", parser=parser, validator=None))
 
     return ExtractionConfig(
         project_id=namespace.project_id,
-        region=namespace.region.lower(),
+        location_filters=location_filters,
         output_dir=output_dir,
         days=days,
         max_rows=max_rows,
         output_format=namespace.output_format,
         datasets=datasets,
-        skip_steps=skip_steps,
+        include_families=frozenset(family_values),
+        exclude_families=frozenset(excluded_families),
+        include_sources=frozenset(include_sources),
+        exclude_sources=frozenset(excluded_sources),
+        include_hidden_datasets=namespace.include_hidden_datasets,
         quiet=namespace.quiet,
         dry_run=namespace.dry_run,
     )
 
-
-def _parse_skip_steps(raw_value: str | None, parser: argparse.ArgumentParser) -> list[str]:
-    values = _parse_csv_values(raw_value, label="step", parser=parser, validator=None)
-    invalid = [value for value in values if value not in STEP_ORDER]
+def _parse_keywords(
+    raw_value: str | None,
+    *,
+    valid_values: Sequence[str],
+    flag_name: str,
+    parser: argparse.ArgumentParser,
+) -> tuple[str, ...]:
+    values = _parse_csv_values(raw_value, label="value", parser=parser, validator=None)
+    invalid = [value for value in values if value not in valid_values]
     if invalid:
         parser.error(
-            "--skip contains invalid steps: "
+            f"{flag_name} contains invalid values: "
             + ", ".join(invalid)
-            + ". Valid steps: "
-            + ", ".join(STEP_ORDER)
+            + ". Valid values: "
+            + ", ".join(valid_values)
         )
     return values
 

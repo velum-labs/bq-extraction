@@ -12,39 +12,55 @@ def test_default_output_dir_uses_timestamp() -> None:
     assert str(output_dir) == "output/20260316_123456"
 
 
-def test_parse_args_preserves_contract_defaults() -> None:
+def test_parse_args_preserves_discovery_defaults() -> None:
     config = parse_args(["--project", "demo-project"], now=datetime(2026, 3, 16, 12, 34, 56))
 
     assert config.project_id == "demo-project"
-    assert config.region == "us"
+    assert config.location_filters == ()
     assert str(config.output_dir) == "output/20260316_123456"
     assert config.days == 30
     assert config.max_rows == 200000
     assert config.output_format == "json"
     assert config.datasets == ()
-    assert config.skip_steps == frozenset()
+    assert config.include_families == frozenset()
+    assert config.exclude_families == frozenset()
+    assert config.include_sources == frozenset()
+    assert config.exclude_sources == frozenset()
+    assert config.include_hidden_datasets is False
     assert config.quiet is False
     assert config.dry_run is False
 
 
-def test_parse_args_normalizes_region_and_lists() -> None:
+def test_parse_args_normalizes_locations_and_selectors() -> None:
     config = parse_args(
         [
             "--project",
             "demo-project",
-            "--region",
-            "US-CENTRAL1",
+            "--locations",
+            "US,eu,us-central1",
             "--datasets",
             "raw,analytics",
-            "--skip",
-            "query_logs,user_stats",
+            "--families",
+            "tables,jobs",
+            "--sources",
+            "tables.ddls,jobs.query_logs",
+            "--exclude-sources",
+            "jobs.user_stats",
+            "--include-hidden-datasets",
         ]
     )
 
-    assert config.region == "us-central1"
-    assert config.query_location == "US-CENTRAL1"
+    assert config.location_filters == ("us", "eu", "us-central1")
     assert config.datasets == ("raw", "analytics")
-    assert config.skip_steps == frozenset({"query_logs", "user_stats"})
+    assert config.include_families == frozenset({"tables", "jobs"})
+    assert config.include_sources == frozenset({"tables.ddls", "jobs.query_logs"})
+    assert config.exclude_sources == frozenset({"jobs.user_stats"})
+    assert config.include_hidden_datasets is True
+
+
+def test_parse_args_supports_region_alias_for_single_location() -> None:
+    config = parse_args(["--project", "demo-project", "--region", "US"])
+    assert config.location_filters == ("us",)
 
 
 def test_parse_args_rejects_invalid_dataset_names() -> None:
@@ -52,7 +68,17 @@ def test_parse_args_rejects_invalid_dataset_names() -> None:
         parse_args(["--project", "demo-project", "--datasets", "raw,bad-name"])
 
 
-def test_parse_args_rejects_invalid_skip_steps() -> None:
+def test_parse_args_rejects_invalid_family_names() -> None:
     with pytest.raises(SystemExit):
-        parse_args(["--project", "demo-project", "--skip", "made_up_step"])
+        parse_args(["--project", "demo-project", "--families", "made_up_family"])
+
+
+def test_parse_args_rejects_invalid_source_names() -> None:
+    with pytest.raises(SystemExit):
+        parse_args(["--project", "demo-project", "--sources", "jobs.made_up"])
+
+
+def test_parse_args_rejects_region_and_locations_together() -> None:
+    with pytest.raises(SystemExit):
+        parse_args(["--project", "demo-project", "--region", "us", "--locations", "eu"])
 

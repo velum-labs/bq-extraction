@@ -17,20 +17,87 @@ class QueryResult:
     rows: list[dict[str, Any]]
 
 
+@dataclass(frozen=True)
+class DatasetDiscovery:
+    project_id: str
+    dataset_id: str
+    location: str
+    payload: dict[str, Any]
+
+    @property
+    def qualified_id(self) -> str:
+        return f"{self.project_id}.{self.dataset_id}"
+
+
 class BigQueryService:
-    def __init__(self, project_id: str, *, query_location: str | None = None) -> None:
+    def __init__(self, project_id: str) -> None:
         self._client = bigquery.Client(project=project_id)
-        self._query_location = query_location
+        self._project_id = project_id
 
-    def list_datasets(self) -> list[dict[str, Any]]:
-        datasets = sorted(self._client.list_datasets(), key=lambda dataset: dataset.dataset_id)
-        return [dataset.to_api_repr() for dataset in datasets]
+    def list_datasets(self, *, include_hidden: bool = False) -> list[DatasetDiscovery]:
+        dataset_items = sorted(
+            self._client.list_datasets(project=self._project_id, include_all=include_hidden),
+            key=lambda dataset: dataset.dataset_id,
+        )
+        discoveries: list[DatasetDiscovery] = []
+        for dataset in dataset_items:
+            payload = normalize_api_resource(dataset.to_api_repr())
+            reference = payload.get("datasetReference", {})
+            discoveries.append(
+                DatasetDiscovery(
+                    project_id=str(reference.get("projectId", self._project_id)),
+                    dataset_id=str(reference["datasetId"]),
+                    location=str(payload.get("location", "")),
+                    payload=payload,
+                )
+            )
+        return discoveries
 
-    def list_dataset_ids(self) -> list[str]:
-        return [dataset["datasetReference"]["datasetId"] for dataset in self.list_datasets()]
+    def list_table_objects(self, dataset: DatasetDiscovery) -> list[dict[str, Any]]:
+        table_items = sorted(
+            self._client.list_tables(dataset.qualified_id),
+            key=lambda item: item.table_id,
+        )
+        objects: list[dict[str, Any]] = []
+        for table_item in table_items:
+            table = self._client.get_table(table_item.reference)
+            payload = normalize_api_resource(table.to_api_repr())
+            payload["dataset_location"] = dataset.location
+            objects.append(payload)
+        return objects
 
-    def run_query(self, sql: str, max_rows: int) -> QueryResult:
-        query_job = self._client.query(sql, location=self._query_location)
+    def list_routine_objects(self, dataset: DatasetDiscovery) -> list[dict[str, Any]]:
+        routine_items = sorted(
+            self._client.list_routines(dataset.qualified_id),
+            key=lambda item: item.reference.routine_id,
+        )
+        objects: list[dict[str, Any]] = []
+        for routine_item in routine_items:
+            routine = self._client.get_routine(routine_item.reference)
+            payload = normalize_api_resource(routine.to_api_repr())
+            payload["dataset_location"] = dataset.location
+            objects.append(payload)
+        return objects
+
+    def list_model_objects(self, dataset: DatasetDiscovery) -> list[dict[str, Any]]:
+        model_items = sorted(
+            self._client.list_models(dataset.qualified_id),
+            key=lambda item: item.reference.model_id,
+        )
+        objects: list[dict[str, Any]] = []
+        for model_item in model_items:
+            model = self._client.get_model(model_item.reference)
+            payload = normalize_api_resource(model.to_api_repr())
+            payload["dataset_location"] = dataset.location
+            objects.append(payload)
+        return objects
+
+    def probe_query(self, sql: str, *, location: str) -> None:
+        query_job = self._client.query(sql, location=location)
+        query_job.result(max_results=1)
+
+    def run_query(self, sql: str, max_rows: int, *, location: str) -> QueryResult:
+        query_job = self._client.query(sql, location=location)
         row_iterator = query_job.result(max_results=max_rows)
         field_names = tuple(field.name for field in query_job.schema)
         rows = [self._normalize_row(row, field_names) for row in row_iterator]
@@ -42,6 +109,10 @@ class BigQueryService:
 
     def _normalize_row(self, row: Row, field_names: tuple[str, ...]) -> dict[str, Any]:
         return {field_name: normalize_value(row[field_name]) for field_name in field_names}
+
+
+def normalize_api_resource(payload: dict[str, Any]) -> dict[str, Any]:
+    return {key: normalize_value(value) for key, value in payload.items()}
 
 
 def normalize_value(value: Any) -> Any:

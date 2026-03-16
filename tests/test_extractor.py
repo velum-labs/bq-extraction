@@ -2,90 +2,119 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 from bq_extraction_demo.config import ExtractionConfig
-from bq_extraction_demo.contract import STEP_ORDER
+from bq_extraction_demo.service import DatasetDiscovery, QueryResult
 from bq_extraction_demo.extractor import ExtractionRunner
-from bq_extraction_demo.service import QueryResult
 
 
 class FakeService:
-    def __init__(
-        self,
-        *,
-        datasets: list[dict[str, Any]] | None = None,
-        dataset_ids: list[str] | None = None,
-    ) -> None:
-        self.datasets = datasets or [
-            {"datasetReference": {"datasetId": "analytics"}},
-            {"datasetReference": {"datasetId": "raw"}},
+    def __init__(self) -> None:
+        self.datasets = [
+            DatasetDiscovery(
+                project_id="demo-project",
+                dataset_id="analytics",
+                location="US",
+                payload={
+                    "datasetReference": {"projectId": "demo-project", "datasetId": "analytics"},
+                    "location": "US",
+                },
+            ),
+            DatasetDiscovery(
+                project_id="demo-project",
+                dataset_id="staging",
+                location="EU",
+                payload={
+                    "datasetReference": {"projectId": "demo-project", "datasetId": "staging"},
+                    "location": "EU",
+                },
+            ),
         ]
-        self.dataset_ids = dataset_ids or ["analytics", "raw"]
-        self.queries: list[tuple[str, int]] = []
-        self.fail_region_columns = False
-        self.fail_column_descriptions = False
+        self.include_hidden_flags: list[bool] = []
+        self.probes: list[tuple[str, str]] = []
+        self.queries: list[tuple[str, int, str]] = []
+        self.fail_region_tables_probe = False
+        self.fail_jobs_probe = False
+        self.fail_dataset_discovery = False
 
-    def list_datasets(self) -> list[dict[str, Any]]:
+    def list_datasets(self, *, include_hidden: bool = False) -> list[DatasetDiscovery]:
+        self.include_hidden_flags.append(include_hidden)
+        if self.fail_dataset_discovery:
+            raise RuntimeError("dataset discovery failed")
         return self.datasets
 
-    def list_dataset_ids(self) -> list[str]:
-        if self.fail_column_descriptions:
-            raise RuntimeError("dataset lookup failed")
-        return self.dataset_ids
+    def list_table_objects(self, dataset: DatasetDiscovery) -> list[dict[str, object]]:
+        return [
+            {
+                "tableReference": {
+                    "projectId": dataset.project_id,
+                    "datasetId": dataset.dataset_id,
+                    "tableId": f"{dataset.dataset_id}_table",
+                },
+                "tableType": "TABLE",
+                "dataset_location": dataset.location,
+                "schema": {
+                    "fields": [
+                        {"name": "id", "type": "INT64", "mode": "REQUIRED"},
+                        {"name": "note", "type": "STRING", "mode": "NULLABLE"},
+                    ]
+                },
+            }
+        ]
 
-    def run_query(self, sql: str, max_rows: int) -> QueryResult:
-        self.queries.append((sql, max_rows))
+    def list_routine_objects(self, dataset: DatasetDiscovery) -> list[dict[str, object]]:
+        return [
+            {
+                "routineReference": {
+                    "projectId": dataset.project_id,
+                    "datasetId": dataset.dataset_id,
+                    "routineId": f"{dataset.dataset_id}_routine",
+                },
+                "routineType": "SCALAR_FUNCTION",
+                "dataset_location": dataset.location,
+            }
+        ]
 
-        if self.fail_region_columns and "region-us" in sql and "INFORMATION_SCHEMA.COLUMNS" in sql:
+    def list_model_objects(self, dataset: DatasetDiscovery) -> list[dict[str, object]]:
+        return [
+            {
+                "modelReference": {
+                    "projectId": dataset.project_id,
+                    "datasetId": dataset.dataset_id,
+                    "modelId": f"{dataset.dataset_id}_model",
+                },
+                "modelType": "LINEAR_REGRESSION",
+                "dataset_location": dataset.location,
+            }
+        ]
+
+    def probe_query(self, sql: str, *, location: str) -> None:
+        self.probes.append((sql, location))
+        if self.fail_region_tables_probe and "region-us" in sql and "INFORMATION_SCHEMA.TABLES" in sql:
             raise RuntimeError("region denied")
+        if self.fail_jobs_probe and "JOBS_BY_PROJECT" in sql:
+            raise RuntimeError("missing jobs permission")
 
-        if "INFORMATION_SCHEMA.COLUMNS" in sql:
+    def run_query(self, sql: str, max_rows: int, *, location: str) -> QueryResult:
+        self.queries.append((sql, max_rows, location))
+
+        if "INFORMATION_SCHEMA.TABLES" in sql:
             return QueryResult(
                 field_names=(
+                    "table_catalog",
                     "dataset",
                     "table_name",
-                    "column_name",
-                    "ordinal_position",
-                    "data_type",
-                    "is_nullable",
-                    "is_partitioning_column",
-                    "clustering_ordinal_position",
+                    "table_type",
+                    "ddl",
                 ),
                 rows=[
                     {
+                        "table_catalog": "demo-project",
                         "dataset": "analytics",
                         "table_name": "daily_aum",
-                        "column_name": "report_date",
-                        "ordinal_position": "1",
-                        "data_type": "DATE",
-                        "is_nullable": "NO",
-                        "is_partitioning_column": "NO",
-                        "clustering_ordinal_position": None,
+                        "table_type": "BASE TABLE",
+                        "ddl": "CREATE TABLE `demo-project.analytics.daily_aum` (id INT64)",
                     }
-                ],
-            )
-
-        if "COLUMN_FIELD_PATHS" in sql:
-            return QueryResult(
-                field_names=("dataset", "table_name", "column_name", "field_path", "description", "data_type"),
-                rows=[
-                    {
-                        "dataset": "analytics",
-                        "table_name": "daily_aum",
-                        "column_name": "report_date",
-                        "field_path": "report_date",
-                        "description": "Reporting date",
-                        "data_type": "DATE",
-                    },
-                    {
-                        "dataset": "analytics",
-                        "table_name": "daily_aum",
-                        "column_name": "fund_id",
-                        "field_path": "fund_id",
-                        "description": None,
-                        "data_type": "STRING",
-                    },
                 ],
             )
 
@@ -128,28 +157,32 @@ class FakeService:
         return QueryResult(field_names=("value",), rows=[{"value": "1"}])
 
 
-def test_dry_run_does_not_create_output_dir(tmp_path: Path, capsys) -> None:
+def test_dry_run_discovers_and_probes_without_writing_output_dir(tmp_path: Path, capsys) -> None:
     config = make_config(
         tmp_path,
         dry_run=True,
-        skip_steps=skip_all_except("columns"),
+        include_families=frozenset({"datasets", "tables"}),
+        include_sources=frozenset({"tables.ddls"}),
     )
 
-    runner = ExtractionRunner(config, service=FakeService())
+    service = FakeService()
+    runner = ExtractionRunner(config, service=service)
     runner.run()
 
     captured = capsys.readouterr()
     assert not config.output_dir.exists()
     assert "[dry-run] ->" in captured.out
-    assert "region-level, with per-dataset fallback" in captured.out
-    assert "Dry run complete. No queries were executed." in captured.out
+    assert "tables.ddls @ US (region scope)" in captured.out
+    assert "Dry run complete. No output files were written." in captured.out
+    assert service.probes
 
 
 def test_quiet_mode_prints_only_output_dir(tmp_path: Path, capsys) -> None:
     config = make_config(
         tmp_path,
         quiet=True,
-        skip_steps=frozenset(STEP_ORDER),
+        include_families=frozenset({"datasets"}),
+        exclude_families=frozenset({"tables", "routines", "models", "jobs"}),
     )
 
     runner = ExtractionRunner(config, service=FakeService())
@@ -159,70 +192,146 @@ def test_quiet_mode_prints_only_output_dir(tmp_path: Path, capsys) -> None:
     assert config.output_dir.exists()
     assert captured.out.strip() == str(config.output_dir)
     assert captured.err == ""
+    assert (config.output_dir / "datasets.json").exists()
 
 
-def test_region_query_falls_back_to_per_dataset_union(tmp_path: Path) -> None:
+def test_tables_capability_falls_back_to_dataset_scope(tmp_path: Path) -> None:
     config = make_config(
         tmp_path,
-        skip_steps=skip_all_except("columns"),
+        include_families=frozenset({"datasets", "tables"}),
+        include_sources=frozenset({"tables.ddls"}),
+        exclude_families=frozenset({"routines", "models", "jobs"}),
     )
     service = FakeService()
-    service.fail_region_columns = True
+    service.fail_region_tables_probe = True
 
     runner = ExtractionRunner(config, service=service)
     runner.run()
 
-    output_path = config.output_dir / "columns.json"
+    output_path = config.output_dir / "tables.ddls.json"
     payload = json.loads(output_path.read_text(encoding="utf-8"))
 
-    assert len(service.queries) == 2
-    assert "region-us" in service.queries[0][0]
-    assert "`demo-project`.`analytics`.INFORMATION_SCHEMA.COLUMNS" in service.queries[1][0]
-    assert payload[0]["column_name"] == "report_date"
+    assert any("region-us" in probe[0] for probe in service.probes)
+    assert any("`demo-project`.`analytics`.INFORMATION_SCHEMA.TABLES" in query[0] for query in service.queries)
+    assert any(row["location"] == "US" for row in payload)
+    assert any(row["table_name"] == "daily_aum" for row in payload)
 
 
-def test_csv_output_serializes_nested_values(tmp_path: Path) -> None:
+def test_derived_output_names_are_written_for_selected_families_and_sources(tmp_path: Path) -> None:
     config = make_config(
         tmp_path,
-        output_format="csv",
-        skip_steps=skip_all_except("query_logs"),
+        include_families=frozenset({"datasets", "tables", "routines", "models", "jobs"}),
+        include_sources=frozenset({"tables.ddls", "jobs.query_logs"}),
     )
 
     runner = ExtractionRunner(config, service=FakeService())
     runner.run()
 
-    contents = (config.output_dir / "query_logs.csv").read_text(encoding="utf-8")
-    assert "job_id,labels,cache_hit" in contents
+    assert (config.output_dir / "datasets.json").exists()
+    assert (config.output_dir / "tables.json").exists()
+    assert (config.output_dir / "routines.json").exists()
+    assert (config.output_dir / "models.json").exists()
+    assert (config.output_dir / "tables.ddls.json").exists()
+    assert (config.output_dir / "jobs.query_logs.json").exists()
+
+
+def test_unavailable_capability_is_skipped_cleanly(tmp_path: Path) -> None:
+    config = make_config(
+        tmp_path,
+        include_families=frozenset({"datasets", "jobs"}),
+        include_sources=frozenset({"jobs.query_logs"}),
+        exclude_families=frozenset({"tables", "routines", "models"}),
+    )
+    service = FakeService()
+    service.fail_jobs_probe = True
+
+    runner = ExtractionRunner(config, service=service)
+    runner.run()
+
+    assert (config.output_dir / "datasets.json").exists()
+    assert not (config.output_dir / "jobs.query_logs.json").exists()
+
+
+def test_csv_output_serializes_nested_query_rows(tmp_path: Path) -> None:
+    config = make_config(
+        tmp_path,
+        output_format="csv",
+        include_families=frozenset({"jobs"}),
+        include_sources=frozenset({"jobs.query_logs"}),
+        exclude_families=frozenset({"datasets", "tables", "routines", "models"}),
+    )
+
+    runner = ExtractionRunner(config, service=FakeService())
+    runner.run()
+
+    contents = (config.output_dir / "jobs.query_logs.csv").read_text(encoding="utf-8")
+    assert "location,job_id,labels,cache_hit" in contents
     assert '"[{""key"":""airflow_dag_id"",""value"":""demo""}]"' in contents
     assert "job-1" in contents
 
 
-def test_float_values_preserve_decimal_text(tmp_path: Path) -> None:
+def test_location_filters_limit_discovery_and_probing(tmp_path: Path) -> None:
     config = make_config(
         tmp_path,
-        skip_steps=skip_all_except("query_sources"),
-    )
-
-    runner = ExtractionRunner(config, service=FakeService())
-    runner.run()
-
-    payload = json.loads((config.output_dir / "query_sources.json").read_text(encoding="utf-8"))
-    assert payload[0]["total_slot_hours"] == "0.0"
-
-
-def test_column_description_failure_writes_empty_json(tmp_path: Path) -> None:
-    config = make_config(
-        tmp_path,
-        skip_steps=skip_all_except("column_descriptions"),
+        location_filters=("us",),
+        include_families=frozenset({"datasets", "tables"}),
+        include_sources=frozenset({"tables.ddls"}),
+        exclude_families=frozenset({"routines", "models", "jobs"}),
     )
     service = FakeService()
-    service.fail_column_descriptions = True
 
     runner = ExtractionRunner(config, service=service)
     runner.run()
 
-    output_path = config.output_dir / "column_descriptions.json"
-    assert json.loads(output_path.read_text(encoding="utf-8")) == []
+    datasets_payload = json.loads((config.output_dir / "datasets.json").read_text(encoding="utf-8"))
+    assert len(datasets_payload) == 1
+    assert datasets_payload[0]["datasetReference"]["datasetId"] == "analytics"
+    assert all(location == "US" for _, location in service.probes)
+
+
+def test_hyphenated_locations_are_canonicalized_for_grouping(tmp_path: Path) -> None:
+    config = make_config(
+        tmp_path,
+        location_filters=("us-central1",),
+        include_families=frozenset({"datasets", "tables"}),
+        include_sources=frozenset({"tables.ddls"}),
+        exclude_families=frozenset({"routines", "models", "jobs"}),
+    )
+    service = FakeService()
+    service.datasets = [
+        DatasetDiscovery(
+            project_id="demo-project",
+            dataset_id="regional",
+            location="US-CENTRAL1",
+            payload={
+                "datasetReference": {"projectId": "demo-project", "datasetId": "regional"},
+                "location": "US-CENTRAL1",
+            },
+        )
+    ]
+
+    runner = ExtractionRunner(config, service=service)
+    runner.run()
+
+    datasets_payload = json.loads((config.output_dir / "datasets.json").read_text(encoding="utf-8"))
+    assert len(datasets_payload) == 1
+    assert all(location == "us-central1" for _, _, location in service.queries)
+
+
+def test_include_hidden_datasets_flag_is_forwarded(tmp_path: Path) -> None:
+    config = make_config(
+        tmp_path,
+        dry_run=True,
+        include_hidden_datasets=True,
+        include_families=frozenset({"datasets"}),
+        exclude_families=frozenset({"tables", "routines", "models", "jobs"}),
+    )
+    service = FakeService()
+
+    runner = ExtractionRunner(config, service=service)
+    runner.run()
+
+    assert service.include_hidden_flags == [True]
 
 
 def make_config(
@@ -231,23 +340,27 @@ def make_config(
     output_format: str = "json",
     quiet: bool = False,
     dry_run: bool = False,
-    skip_steps: frozenset[str] | None = None,
+    include_families: frozenset[str] | None = None,
+    exclude_families: frozenset[str] | None = None,
+    include_sources: frozenset[str] | None = None,
+    exclude_sources: frozenset[str] | None = None,
+    include_hidden_datasets: bool = False,
+    location_filters: tuple[str, ...] = (),
 ) -> ExtractionConfig:
     return ExtractionConfig(
         project_id="demo-project",
-        region="us",
+        location_filters=location_filters,
         output_dir=tmp_path / "output",
         days=30,
         max_rows=200000,
         output_format=output_format,
         datasets=(),
-        skip_steps=skip_steps or frozenset(),
+        include_families=include_families or frozenset(),
+        exclude_families=exclude_families or frozenset(),
+        include_sources=include_sources or frozenset(),
+        exclude_sources=exclude_sources or frozenset(),
+        include_hidden_datasets=include_hidden_datasets,
         quiet=quiet,
         dry_run=dry_run,
     )
-
-
-def skip_all_except(*step_keys: str) -> frozenset[str]:
-    keep = set(step_keys)
-    return frozenset(step for step in STEP_ORDER if step not in keep)
 

@@ -18,17 +18,17 @@ def test_cli_dry_run_smoke(tmp_path: Path) -> None:
         "scripts/extract.py",
         "--project",
         "demo-project",
+        "--region",
+        "us",
         "--output-dir",
         str(tmp_path / "dry-run-output"),
-        "--skip",
-        "datasets",
         "--dry-run",
     ]
 
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
 
     assert result.returncode == 0, result.stderr
-    assert "Dry run complete. No queries were executed." in result.stdout
+    assert "Dry run complete. No output files were written." in result.stdout
     assert not (tmp_path / "dry-run-output").exists()
 
 
@@ -60,5 +60,5 @@ def test_cli_live_smoke(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stderr
     assert output_dir.exists()
     assert (output_dir / "datasets.json").exists()
-    assert (output_dir / "columns.json").exists()
+    assert (output_dir / "tables.json").exists()
 

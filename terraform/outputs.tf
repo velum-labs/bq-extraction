@@ -28,13 +28,13 @@ output "extractor_service_account" {
 }
 
 output "extraction_command" {
-  description = "Run this to extract schemas + query logs"
-  value       = "uv run python scripts/extract.py --project ${var.project_id} --region ${lower(var.region)}"
+  description = "Run this to auto-discover BigQuery metadata and available job analytics"
+  value       = "uv run python scripts/extract.py --project ${var.project_id}"
 }
 
 output "extraction_as_sa_command" {
-  description = "Run extraction as the minimal-permissions service account"
-  value       = var.create_service_account ? "terraform output -raw extractor_sa_key | base64 -d > /tmp/alma-sa-key.json && gcloud auth activate-service-account --key-file=/tmp/alma-sa-key.json && uv run python scripts/extract.py --project ${var.project_id} --region ${lower(var.region)} && rm /tmp/alma-sa-key.json" : "n/a"
+  description = "Run discovery-based extraction as the minimal-permissions service account"
+  value       = var.create_service_account ? "terraform output -raw extractor_sa_key | base64 -d > /tmp/alma-sa-key.json && gcloud auth activate-service-account --key-file=/tmp/alma-sa-key.json && uv run python scripts/extract.py --project ${var.project_id} && rm /tmp/alma-sa-key.json" : "n/a"
 }
 
 output "extractor_sa_key" {

@@ -1,12 +1,12 @@
-# BQ Schema & Query Log Extraction — Demo Environment
+# BigQuery Discovery-Based Extraction Demo
 
-Reproducible demo: provisions a BigQuery project with realistic fintech schemas, seeds sample data + query traffic, then runs the extraction tooling to produce actual output.
+Reproducible demo: provisions a BigQuery project with realistic fintech schemas, seeds sample data + query traffic, then runs a discovery-first extractor that auto-discovers what metadata is available through BigQuery APIs, SDKs, and scoped `INFORMATION_SCHEMA` capabilities.
 
 ## What This Proves
 
-1. The extraction commands work end-to-end
-2. Output format is useful (schemas, DDLs, query logs, access patterns)
-3. Minimum IAM permissions are correct
+1. The extractor discovers datasets, tables/views, routines, models, and optional jobs metadata without a hardcoded warehouse shape
+2. Output format is useful for inventory, schema, DDL, and jobs analysis
+3. Location-aware capability probing behaves correctly under partial permissions
 4. Javier can replicate with one script swap (`PROJECT_ID`)
 
 ## Prerequisites
@@ -46,12 +46,12 @@ cd ../scripts
 
 # 4. Run extraction (the thing we're demoing)
 cd ..
-uv run python scripts/extract.py --project <project-id> --region us
+uv run python scripts/extract.py --project <project-id>
 
 # 5. Check output
-ls -lh output/
 LATEST_OUTPUT="$(ls -td output/* | head -1)"
-python3 -m json.tool "$LATEST_OUTPUT/columns.json" | head -50
+ls -lh "$LATEST_OUTPUT"
+python3 -m json.tool "$LATEST_OUTPUT/tables.json" | head -50
 
 # 6. Teardown
 cd terraform
@@ -61,29 +61,43 @@ terraform destroy
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│ GCP Project                                      │
-│                                                  │
-│  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
-│  │ raw      │  │ staging  │  │ analytics     │  │
-│  │          │  │          │  │               │  │
-│  │ funds    │  │ stg_txns │  │ daily_aum     │  │
-│  │ txns     │  │ stg_users│  │ user_portfolio│  │
-│  │ users    │  │          │  │ cmf_report    │  │
-│  │ nav      │  │          │  │               │  │
-│  └──────────┘  └──────────┘  └───────────────┘  │
-│                                                  │
-│  ┌──────────────────────────────────────────┐    │
-│  │ INFORMATION_SCHEMA                        │    │
-│  │  .COLUMNS  .TABLES  .JOBS                │    │
-│  └──────────────────────────────────────────┘    │
-│                                                  │
-│  ┌──────────────────────┐                        │
-│  │ SA: alma-extractor   │ (dataViewer +          │
-│  │                      │  resourceViewer)       │
-│  └──────────────────────┘                        │
-└─────────────────────────────────────────────────┘
+BigQuery APIs / Python SDK
+  - datasets.list
+  - tables.list + tables.get
+  - routines.list + routines.get
+  - models.list + models.get
+          |
+          v
+Discovered datasets grouped by location
+          |
+          v
+Capability probe
+  - INFORMATION_SCHEMA.TABLES for DDLs
+  - INFORMATION_SCHEMA.JOBS_BY_PROJECT for jobs-derived recipes
+          |
+          v
+Derived outputs
+  - datasets.json
+  - tables.json
+  - routines.json
+  - models.json
+  - tables.ddls.json
+  - jobs.*.json
 ```
+
+## Discovery Model
+
+- The extractor uses official BigQuery APIs and the Python SDK first, then falls back to `INFORMATION_SCHEMA` only for metadata the API does not expose equivalently, such as DDL and jobs-derived recipes.
+- Extraction is location-aware. Datasets are discovered first, then grouped by location so region-qualified metadata queries run in the correct BigQuery location.
+- Metadata capabilities are probed before extraction. If a capability is unavailable because of scope or permissions, it is skipped cleanly and reported.
+- Hidden datasets are excluded by default. Use `--include-hidden-datasets` to include them in API-backed discovery, with the caveat that `INFORMATION_SCHEMA` does not expose hidden-dataset metadata consistently.
+
+## Common Flags
+
+- `--locations us,eu,...` limits discovery and extraction to specific BigQuery locations. `--region` is kept as a single-location alias for compatibility with older demo flows.
+- `--families datasets,tables,routines,models,jobs` narrows which object families are emitted.
+- `--sources tables.ddls,jobs.query_logs,...` narrows which non-API metadata capabilities run.
+- `--dry-run` performs discovery and capability probing without writing output files.
 
 ## Directory Structure
 
@@ -101,7 +115,7 @@ bq-extraction-demo/
 │   ├── seed_queries.sh      # runs realistic queries to populate JOBS
 │   └── extract.py           # Python extractor entrypoint
 ├── src/
-│   └── bq_extraction_demo/  # extractor package
+│   └── bq_extraction_demo/  # extractor package + capability registry
 ├── tests/                   # unit + smoke coverage
 ├── uv.lock                  # pinned dependency lockfile
 └── sample_output/           # reference output from a successful run
