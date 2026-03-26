@@ -137,8 +137,14 @@ class ExtractionRunner:
         logger: logging.Logger | None = None,
     ) -> None:
         self.config = config
-        self.service = service or BigQueryService(config.project_id)
+        self._service = service
         self.logger = logger or build_logger(quiet=config.quiet)
+
+    @property
+    def service(self) -> DiscoveryService:
+        if self._service is None:
+            self._service = BigQueryService(self.config.project_id)
+        return self._service
 
     def run(self) -> Path:
         if not self.config.dry_run:

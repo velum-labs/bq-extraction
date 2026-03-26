@@ -47,7 +47,7 @@ In practice, that means:
 
 ## Prerequisites
 
-- Python 3.9+
+- Python 3.10+
 - [`uv`](https://github.com/astral-sh/uv)
 - [`gcloud`](https://cloud.google.com/sdk/docs/install)
 - access to the target BigQuery project
@@ -69,6 +69,13 @@ gcloud services enable bigquery.googleapis.com iam.googleapis.com
 
 ```bash
 uv sync
+```
+
+If you also want the offline lineage notebook and graph export tooling, install
+the `analysis` extra:
+
+```bash
+uv sync --extra analysis
 ```
 
 ## Run Extraction
@@ -200,6 +207,55 @@ If jobs capabilities are available, inspect those next:
 python3 -m json.tool "$LATEST_OUTPUT/jobs.query_sources.json"
 python3 -m json.tool "$LATEST_OUTPUT/jobs.user_stats.json"
 ```
+
+## Offline Lineage And Full Graph Export
+
+This repository can also build an offline lineage graph from previously
+extracted results and export the full graph for external graph tools.
+
+Build lineage from an existing results directory:
+
+```bash
+uv run python scripts/build_lineage.py \
+  --results-dir ../velum-extraction-results \
+  --output-dir output/lineage
+```
+
+This command requires the `analysis` extra:
+
+```bash
+uv sync --extra analysis
+```
+
+That produces:
+
+- neutral lineage JSON
+- Atlas-compatible JSON and SQLite output
+- full-graph exports such as:
+  - `lineage.graphml` for the full mixed graph
+  - `lineage_assets_only.graphml` for the raw physical asset graph
+  - `lineage_assets_logical.graphml` for the de-noised logical asset graph
+  - NDJSON and chunked compact JSON
+
+See [`docs/full_graph_workflow.md`](docs/full_graph_workflow.md) for the
+desktop graph workflow in Gephi or Cytoscape and for export format details.
+
+## Standalone Validation
+
+This repository is intended to work from a clean clone, without requiring a
+sibling `atlas` checkout.
+
+Local validation:
+
+```bash
+uv sync --extra analysis
+uv run pytest
+uv run python scripts/extract.py --help
+uv run python scripts/build_lineage.py --help
+```
+
+The same contract is enforced in the repo-local GitHub Actions workflow under
+`.github/workflows/ci.yml`.
 
 ## Permissions And Behavior Notes
 

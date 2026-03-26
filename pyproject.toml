@@ -3,9 +3,19 @@ name = "bq-extraction"
 version = "0.1.0"
 description = "BigQuery extraction tooling"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "google-cloud-bigquery>=3.40.1",
+    "sqlglot>=25.0.0",
+]
+
+[project.optional-dependencies]
+analysis = [
+    "pandas>=2.0",
+    "plotly>=5.0",
+    "nbformat>=4.2",
+    "ipykernel>=6.0",
+    "networkx>=3.2.1",
 ]
 
 [build-system]
@@ -21,5 +31,6 @@ testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
+    "networkx>=3.2.1",
     "pytest>=8.4.2",
 ]
